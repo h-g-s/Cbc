@@ -1,4 +1,4 @@
-// $Id$
+// $Id: driver3.cpp 1898 2013-04-09 18:06:04Z stefan $
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -8,6 +8,7 @@
 
 #include "CoinPragma.hpp"
 #include "CbcModel.hpp"
+#include "CbcSolver.hpp"
 #include "OsiClpSolverInterface.hpp"
 #include "CbcBranchDynamic.hpp"
 
@@ -27,6 +28,12 @@ Then it calls CbcMain1 passing all parameters apart from first
 Finally it prints solution
 
 ************************************************************************/
+
+static int dummyCallBack(CbcModel * /*model*/, int /*whereFrom*/)
+{
+    return 0;
+}
+
 
 int main (int argc, const char *argv[])
 {
@@ -68,9 +75,13 @@ int main (int argc, const char *argv[])
       integer[i]=0;
     }
   }
+
+  CbcSolverUsefulData cbcData;
+  cbcData.noPrinting_ = false;
+
   // Pass to Cbc initialize defaults 
   CbcModel model(solver1);    
-  CbcMain0(model);
+  CbcMain0( model, cbcData );
 
   // Solve just to show there are no integers
   model.branchAndBound();
@@ -106,10 +117,10 @@ int main (int argc, const char *argv[])
      but this will do
   */
   if (argc>2) {
-    CbcMain1(argc-1,argv+1,model);
+    CbcMain1(argc-1,argv+1,model, dummyCallBack, cbcData );
   } else {
     const char * argv2[]={"driver3","-solve","-quit"};
-    CbcMain1(3,argv2,model);
+    CbcMain1(3,argv2,model, dummyCallBack, cbcData );
   }
 
   // Print solution if finished (could get from model.bestSolution() as well

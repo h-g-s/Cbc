@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcModel.hpp 2373 2018-05-18 09:45:54Z forrest $ */
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -17,7 +17,6 @@
 #include "CbcMessage.hpp"
 #include "CbcEventHandler.hpp"
 #include "ClpDualRowPivot.hpp"
-
 
 class CbcCutGenerator;
 class CbcBaseModel;
@@ -2962,18 +2961,22 @@ int callCbc(const std::string input2, OsiClpSolverInterface& solver1);
 int callCbc(const std::string input2) ;
 // When we want to load up CbcModel with options first
 void CbcMain0 (CbcModel & babSolver);
-int CbcMain1 (int argc, const char *argv[], CbcModel & babSolver);
+
+//int CbcMain1 (int argc, const char *argv[], CbcModel & babSolver);
 // two ways of calling
 int callCbc(const char * input2, CbcModel & babSolver);
 int callCbc(const std::string input2, CbcModel & babSolver);
 // And when CbcMain0 already called to initialize
-int callCbc1(const char * input2, CbcModel & babSolver);
-int callCbc1(const std::string input2, CbcModel & babSolver);
+
+// removing non thread safe callCbc1 methods
+//int callCbc1(const char * input2, CbcModel & babSolver);
+//int callCbc1(const std::string input2, CbcModel & babSolver);
 // And when CbcMain0 already called to initialize (with call back) (see CbcMain1 for whereFrom)
-int callCbc1(const char * input2, CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
-int callCbc1(const std::string input2, CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
-int CbcMain1 (int argc, const char *argv[], CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
+//int callCbc1(const char * input2, CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
+//int callCbc1(const std::string input2, CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
+//int CbcMain1 (int argc, const char *argv[], CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
 // For uniform setting of cut and heuristic options
 void setCutAndHeuristicOptions(CbcModel & model);
+
 #endif
 

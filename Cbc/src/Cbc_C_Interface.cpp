@@ -1,4 +1,4 @@
-// $Id$
+// $Id: Cbc_C_Interface.cpp 2363 2018-02-14 11:21:56Z forrest $
 // Copyright (C) 2004, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -12,6 +12,7 @@
 #include "CoinTime.hpp"
 
 #include "CbcModel.hpp"
+#include "CbcSolver.hpp"
 #include "CbcBranchActual.hpp"
 
 #include "CoinMessageHandler.hpp"
@@ -243,8 +244,10 @@ Cbc_newModel()
     OsiClpSolverInterface solver1;
     model->solver_    = &solver1;
     model->model_     = new CbcModel(solver1);
-    CbcMain0(*model->model_);
+    CbcMain0( *model->model_, *model->cbcData );
     model->handler_   = NULL;
+    model->cbcData = new CbcSolverUsefulData(); 
+    model->cbcData->noPrinting_ = false;
 
     if (VERBOSE > 0) printf("%s return\n", prefix);
     return model;
@@ -265,6 +268,8 @@ Cbc_deleteModel(Cbc_Model * model)
     if (VERBOSE > 1) printf("%s delete model->handler_\n", prefix);
     fflush(stdout);
     delete model->handler_;
+
+    delete model->cbcData;
 
     if (VERBOSE > 1) printf("%s delete model\n", prefix);
     fflush(stdout);
@@ -550,6 +555,11 @@ Cbc_setRowName(Cbc_Model * model, int iRow, const char * name)
     model->model_->solver()->setRowName(iRow, name);
 }
 
+static int dummyCallBack(CbcModel * /*model*/, int /*whereFrom*/)
+{
+    return 0;
+}
+
 
 COINLIBAPI int COINLINKAGE
 Cbc_solve(Cbc_Model * model)
@@ -565,7 +575,7 @@ Cbc_solve(Cbc_Model * model)
     argv.push_back("-quit");
     try {
         
-        CbcMain1((int)argv.size(), &argv[0], *model->model_);
+        CbcMain1((int)argv.size(), &argv[0], *model->model_, dummyCallBack, *model->cbcData );
     } catch (CoinError e) {
         printf("%s ERROR: %s::%s, %s\n", prefix,
                e.className().c_str(), e.methodName().c_str(), e.message().c_str());

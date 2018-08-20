@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcSolver.hpp 1998 2013-12-19 18:11:05Z forrest $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -223,9 +223,7 @@ private:
     /// Cpu time at instantiation
     double startTime_;
     /// Parameters and values
-    CbcOrClpParam * parameters_;
-    /// Number of parameters
-    int numberParameters_ ;
+    std::vector< CbcOrClpParam  > parameters_;
     /// Whether to do miplib test
     bool doMiplib_;
     /// Whether to print to std::cout
@@ -283,13 +281,11 @@ public:
     // For time
     double totalTime_;
     // Parameters
-    CbcOrClpParam parameters_[CBCMAXPARAMETERS];
+    std::vector<CbcOrClpParam> parameters_;
     // Printing
     bool noPrinting_;
     // Whether to use signal handler
     bool useSignalHandler_;
-    // Number of Parameters
-    int numberParameters_;
     // Default pump tuning
     int initialPumpTune_;
     //@}
@@ -443,5 +439,16 @@ private:
     //@{
 //@}
 };
+
+#ifdef __GNUC__
+#define DEPRECATED(func) func __attribute__ ((deprecated))
+#elif defined(_MSC_VER)
+#define DEPRECATED(func) __declspec(deprecated) func
+#else
+#pragma message("WARNING: this compiler does not checks for deprecated functions")
+#define DEPRECATED(func) func
+#endif
+
+
 #endif
 
