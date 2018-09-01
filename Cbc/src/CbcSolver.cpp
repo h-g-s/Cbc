@@ -3973,6 +3973,7 @@ int CbcMain1 (int argc, const char *argv[],
                                 if (preProcess == 7) {
                                     // use strategy instead
                                     preProcess = 0;
+<<<<<<< HEAD
                                     useStrategy = true;
 #ifdef COIN_HAS_LINK
                                     // empty out any cuts
@@ -4034,6 +4035,38 @@ int CbcMain1 (int argc, const char *argv[],
                                         preProcess = 0;
                                 }
                                 if (mipStartBefore.size())
+=======
+                            }
+			    if (mipStartBefore.size())
+			      {
+				CbcModel tempModel=*babModel_;
+				assert (babModel_->getNumCols()==model_.getNumCols());
+				std::vector< std::string > colNames;
+				for ( int i=0 ; (i<model_.solver()->getNumCols()) ; ++i )
+				  colNames.push_back( model_.solver()->getColName(i) );
+				std::vector< double > x( model_.getNumCols(), 0.0 );
+				double obj;
+				int status = computeCompleteSolution( &tempModel, colNames, mipStartBefore, &x[0], obj );
+				// set cutoff ( a trifle high) 
+				if (!status) {
+				  double newCutoff = CoinMin(babModel_->getCutoff(),obj+1.0e-4);
+				  babModel_->setBestSolution( &x[0], static_cast<int>(x.size()), obj, false );
+				  babModel_->setCutoff(newCutoff);
+				  babModel_->setSolutionCount(1);
+				  model_.setBestSolution( &x[0], static_cast<int>(x.size()), obj, false );
+				  model_.setCutoff(newCutoff);
+				  model_.setSolutionCount(1);
+				}
+			      }
+                            bool hasTimePreproc = !babModel_->maximumSecondsReached();
+                            if (!hasTimePreproc)
+                                preProcess = 0;
+                            if (preProcess && type == CBC_PARAM_ACTION_BAB) {
+                                saveSolver = babModel_->solver()->clone();
+                                /* Do not try and produce equality cliques and
+                                   do up to 10 passes */
+                                OsiSolverInterface * solver2;
+>>>>>>> c372764525211031d5296bcb4cd1877603f204dd
                                 {
                                     CbcModel tempModel=*babModel_;
                                     assert (babModel_->getNumCols()==model_.getNumCols());
@@ -4351,6 +4384,7 @@ int CbcMain1 (int argc, const char *argv[],
                                                 process.setApplicationData(const_cast<double *>(debugValues));
                                             }
 #endif
+<<<<<<< HEAD
                                             redoSOS=true;
                                             process.setTimeLimit( babModel_->getMaximumSeconds()-babModel_->getCurrentSeconds(), babModel_->useElapsedTime() );
                                             solver2 = process.preProcessNonDefault(*saveSolver, translate[preProcess], numberPasses,
@@ -4365,6 +4399,10 @@ int CbcMain1 (int argc, const char *argv[],
 #elif CBC_OTHER_SOLVER==1
                                         cbcPreProcessPointer = & process;
                                         redoSOS=true;
+=======
+					redoSOS=true;
+                                        process.setTimeLimit( babModel_->getMaximumSeconds()-babModel_->getCurrentSeconds(), babModel_->useElapsedTime() );
+>>>>>>> c372764525211031d5296bcb4cd1877603f204dd
                                         solver2 = process.preProcessNonDefault(*saveSolver, translate[preProcess], numberPasses,
                                                 tunePreProcess);
 #endif
@@ -7423,6 +7461,7 @@ int CbcMain1 (int argc, const char *argv[],
                                         << generalPrint
                                         << CoinMessageEol;
 
+<<<<<<< HEAD
                                     numberGenerators = babModel_->numberCutGenerators();
                                     // can get here twice!
                                     if (statistics_number_cuts!=NULL)
@@ -7454,6 +7493,40 @@ int CbcMain1 (int argc, const char *argv[],
                                         CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
                                         if (stored && !generator->numberCutsInTotal())
                                             continue;
+=======
+                                numberGenerators = babModel_->numberCutGenerators();
+				// can get here twice!
+                                if (statistics_number_cuts!=NULL)
+                                    delete [] statistics_number_cuts;
+                                statistics_number_cuts = new int [numberGenerators];
+
+                                if (statistics_name_generators!=NULL)
+                                    delete [] statistics_name_generators;
+                                statistics_name_generators = new const char *[numberGenerators];
+
+                                statistics_number_generators = numberGenerators;
+
+                                char timing[30];
+                                for (iGenerator = 0; iGenerator < numberGenerators; iGenerator++) {
+                                    CbcCutGenerator * generator = babModel_->cutGenerator(iGenerator);
+                                    statistics_name_generators[iGenerator] =
+                                        generator->cutGeneratorName();
+                                    statistics_number_cuts[iGenerator] = generator->numberCutsInTotal();
+                                    sprintf(generalPrint, "%s was tried %d times and created %d cuts of which %d were active after adding rounds of cuts",
+                                            generator->cutGeneratorName(),
+                                            generator->numberTimesEntered(),
+                                            generator->numberCutsInTotal() +
+                                            generator->numberColumnCuts(),
+                                            generator->numberCutsActive());
+                                    if (generator->timing()) {
+                                        sprintf(timing, " (%.3f seconds)", generator->timeInCutGenerator());
+                                        strcat(generalPrint, timing);
+                                        statistics_cut_time += generator->timeInCutGenerator();
+                                    }
+                                    CglStored * stored = dynamic_cast<CglStored*>(generator->generator());
+                                    if (stored && !generator->numberCutsInTotal())
+                                        continue;
+>>>>>>> c372764525211031d5296bcb4cd1877603f204dd
 #ifndef CLP_INVESTIGATE
                                         CglImplication * implication = dynamic_cast<CglImplication*>(generator->generator());
                                         if (implication && !generator->numberCutsInTotal())
@@ -7743,6 +7816,7 @@ int CbcMain1 (int argc, const char *argv[],
                                         assert (originalSolver->isProvenOptimal());
                                     }
 #endif
+<<<<<<< HEAD
                                     checkSOS(babModel_, babModel_->solver());
                                 } else if (model_.bestSolution() && type == CBC_PARAM_ACTION_BAB && model_.getMinimizationObjValue() < 1.0e50 && preProcess) {
                                     sprintf(generalPrint, "Restoring heuristic best solution of %g", model_.getMinimizationObjValue());
@@ -7777,6 +7851,157 @@ int CbcMain1 (int argc, const char *argv[],
                                         CoinWarmStartBasis * basis = dynamic_cast<CoinWarmStartBasis *> (babModel_->solver()->getWarmStart());
                                         originalSolver->setBasis(*basis);
                                         delete basis;
+=======
+                        break;
+                    case CLP_PARAM_ACTION_HELP:
+                        std::cout << "Cbc version " << CBC_VERSION
+                                  << ", build " << __DATE__ << std::endl;
+                        std::cout << "Non default values:-" << std::endl;
+                        std::cout << "Perturbation " << lpSolver->perturbation() << " (default 100)"
+                                  << std::endl;
+                        CoinReadPrintit(
+                            "Presolve being done with 5 passes\n\
+Dual steepest edge steep/partial on matrix shape and factorization density\n\
+Clpnnnn taken out of messages\n\
+If Factorization frequency default then done on size of matrix\n\n\
+(-)unitTest, (-)netlib or (-)netlibp will do standard tests\n\n\
+You can switch to interactive mode at any time so\n\
+clp watson.mps -scaling off -primalsimplex\nis the same as\n\
+clp watson.mps -\nscaling off\nprimalsimplex"
+                        );
+                        break;
+                    case CLP_PARAM_ACTION_CSVSTATISTICS: {
+                        // get next field
+                        field = CoinReadGetString(argc, argv);
+                        if (field == "$") {
+                            field = parameters_[iParam].stringValue();
+                        } else if (field == "EOL") {
+                            parameters_[iParam].printString();
+                            break;
+                        } else {
+                            parameters_[iParam].setStringValue(field);
+                        }
+                        std::string fileName;
+                        if (field[0] == '/' || field[0] == '\\') {
+                            fileName = field;
+                        } else if (field[0] == '~') {
+                            char * environVar = getenv("HOME");
+                            if (environVar) {
+                                std::string home(environVar);
+                                field = field.erase(0, 1);
+                                fileName = home + field;
+                            } else {
+                                fileName = field;
+                            }
+                        } else {
+                            fileName = directory + field;
+                        }
+                        int state = 0;
+                        char buffer[1000];
+                        FILE *fp = fopen(fileName.c_str(), "r");
+                        if (fp) {
+                            // file already there
+                            state = 1;
+                            char * getBuffer = fgets(buffer, 1000, fp);
+                            if (getBuffer) {
+                                // assume header there
+                                state = 2;
+                            }
+                            fclose(fp);
+                        }
+                        fp = fopen(fileName.c_str(), "a");
+                        if (fp) {
+                            // can open - lets go for it
+                            // first header if needed
+                            if (state != 2) {
+                                fprintf(fp, "Name,result,time,sys,elapsed,objective,continuous,tightened,cut_time,nodes,iterations,rows,columns,processed_rows,processed_columns");
+                                for (int i = 0; i < statistics_number_generators; i++)
+                                    fprintf(fp, ",%s", statistics_name_generators[i]);
+                                fprintf(fp, ",runtime_options");
+                                fprintf(fp, "\n");
+                            }
+                            strcpy(buffer, argv[1]);
+                            char * slash = buffer;
+                            for (int i = 0; i < static_cast<int>(strlen(buffer)); i++) {
+                                if (buffer[i] == '/' || buffer[i] == '\\')
+                                    slash = buffer + i + 1;
+                            }
+                            fprintf(fp, "%s,%s,%.2f,%.2f,%.2f,%.16g,%g,%g,%.2f,%d,%d,%d,%d,%d,%d",
+                                    slash, statistics_result.c_str(), statistics_seconds,
+                                    statistics_sys_seconds, statistics_elapsed_seconds,
+                                    statistics_obj,
+                                    statistics_continuous, statistics_tighter, statistics_cut_time, statistics_nodes,
+                                    statistics_iterations, statistics_nrows, statistics_ncols,
+                                    statistics_nprocessedrows, statistics_nprocessedcols);
+                            for (int i = 0; i < statistics_number_generators; i++)
+                                fprintf(fp, ",%d", statistics_number_cuts[i]!=NULL ? statistics_number_cuts[i] : 0);
+                            fprintf(fp, ",");
+                            for (int i = 1; i < argc; i++) {
+                                if (strstr(argv[i], ".gz") || strstr(argv[i], ".mps"))
+                                    continue;
+                                if (!argv[i] || !strncmp(argv[i], "-csv", 4))
+                                    break;
+                                fprintf(fp, "%s ", argv[i]);
+                            }
+                            fprintf(fp, "\n");
+                            fclose(fp);
+                        } else {
+			  sprintf(generalPrint, "Unable to open file %s",fileName.c_str());
+			  printGeneralMessage(model_,generalPrint);
+                        }
+                    }
+                    break;
+                    case CLP_PARAM_ACTION_SOLUTION:
+                    case CLP_PARAM_ACTION_NEXTBESTSOLUTION:
+                    case CLP_PARAM_ACTION_GMPL_SOLUTION:
+                        if (goodModel) {
+			  ClpSimplex * saveLpSolver = NULL;
+                            // get next field
+                            field = CoinReadGetString(argc, argv);
+			    bool append = false;
+			    if (field == "append$") {
+			      field = "$";
+			      append = true;
+			    }
+                            if (field == "$") {
+                                field = parameters_[iParam].stringValue();
+                            } else if (field == "EOL") {
+                                parameters_[iParam].printString();
+                                break;
+                            } else {
+                                parameters_[iParam].setStringValue(field);
+                            }
+                            std::string fileName;
+                            FILE *fp = NULL;
+                            if (field == "-" || field == "EOL" || field == "stdout") {
+                                // stdout
+                                fp = stdout;
+                            } else if (field == "stderr") {
+                                // stderr
+                                fp = stderr;
+                            } else {
+                                bool absolutePath;
+                                if (dirsep == '/') {
+                                    // non Windows (or cygwin)
+                                    absolutePath = (field[0] == '/');
+                                } else {
+                                    //Windows (non cycgwin)
+                                    absolutePath = (field[0] == '\\');
+                                    // but allow for :
+                                    if (strchr(field.c_str(), ':'))
+                                        absolutePath = true;
+                                }
+                                if (absolutePath) {
+                                    fileName = field;
+                                } else if (field[0] == '~') {
+                                    char * environVar = getenv("HOME");
+                                    if (environVar) {
+                                        std::string home(environVar);
+                                        field = field.erase(0, 1);
+                                        fileName = home + field;
+                                    } else {
+                                        fileName = field;
+>>>>>>> c372764525211031d5296bcb4cd1877603f204dd
                                     }
 #endif
                                 }
