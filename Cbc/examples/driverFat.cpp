@@ -713,9 +713,10 @@ int main (int argc, const char *argv[])
   solver1.getModelPtr()->setMoreSpecialOptions(3);
 
   // Pass to Cbc initialize defaults 
+  CbcSolverUsefulData cbcData;
   CbcModel modelA(solver1);
   CbcModel * model = &modelA;
-  CbcMain0(modelA);
+  CbcMain0( modelA, cbcData );
   // Event handler
   MyEventHandler3 eventHandler;
   model->passInEventHandler(&eventHandler);
@@ -724,10 +725,10 @@ int main (int argc, const char *argv[])
      but this will do
   */
   if (argc>2) {
-    CbcMain1(argc-1,argv+1,modelA,callBack);
+    CbcMain1( argc-1,argv+1,modelA,callBack, cbcData );
   } else {
     const char * argv2[]={"driverFat","-solve","-quit"};
-    CbcMain1(3,argv2,modelA,callBack);
+    CbcMain1( 3,argv2,modelA,callBack, cbcData );
   }
   // Solver was cloned so get current copy
   OsiSolverInterface * solver = model->solver();
