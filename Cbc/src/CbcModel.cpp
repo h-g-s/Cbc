@@ -15764,6 +15764,13 @@ CbcModel::setBestSolution(const double * solution, int numberColumns,
 void
 CbcModel::doHeuristicsAtRoot(int deleteHeuristicsAfterwards)
 {
+    /*----------SAMUEL_BRITO----------*/
+    if(solver_->useCG()) {
+        solver_->performingHeuristics(true);
+        continuousSolver_->performingHeuristics(true);
+        referenceSolver_->performingHeuristics(true);
+    }
+    /*------------------------*/
 
     int numberColumns = getNumCols() ;
     double * newSolution = new double [numberColumns] ;
@@ -16083,6 +16090,14 @@ CbcModel::doHeuristicsAtRoot(int deleteHeuristicsAfterwards)
         usedInSolution_ = NULL;
     }
     delete [] newSolution ;
+
+    /*----------SAMUEL_BRITO----------*/
+    if(solver_->useCG()) {
+        solver_->performingHeuristics(false);
+        continuousSolver_->performingHeuristics(false);
+        referenceSolver_->performingHeuristics(false);
+    }
+    /*------------------------*/
 }
 // Zap integer information in problem (may leave object info)
 void
@@ -17352,6 +17367,15 @@ CbcModel::doOneNode(CbcModel * baseModel, CbcNode * & node, CbcNode * & newNode)
                     int whereFrom = 3;
 		    // allow more heuristics
 		    currentPassNumber_=0;
+
+            /*----------SAMUEL_BRITO----------*/
+            if(solver_->useCG()) {
+                solver_->performingHeuristics(true);
+                continuousSolver_->performingHeuristics(true);
+                referenceSolver_->performingHeuristics(true);
+            }
+            /*------------------------*/
+
                     for (iHeur = 0 ; iHeur < numberHeuristics_ ; iHeur++) {
                         // skip if can't run here
                         if (!heuristic_[iHeur]->shouldHeurRun(whereFrom))
@@ -17452,6 +17476,15 @@ CbcModel::doOneNode(CbcModel * baseModel, CbcNode * & node, CbcNode * & newNode)
                     }
                 }
             }
+
+        /*----------SAMUEL_BRITO----------*/
+        if(solver_->useCG()) {
+            solver_->performingHeuristics(false);
+            continuousSolver_->performingHeuristics(false);
+            referenceSolver_->performingHeuristics(false);
+        }
+        /*---------------------------------*/
+
         if (branchesLeft) {
             // set nodenumber correctly
             if (node->nodeInfo())

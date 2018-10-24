@@ -182,6 +182,11 @@ static int initialPumpTune = -1;
 #include "CbcLinked.hpp"
 #endif
 
+/*----------SAMUEL_BRITO----------*/
+#include "CglAggressiveClique.hpp"
+//#include "CglExtKnapsack.hpp"
+//#include "CglUsrOddHole.hpp"
+/*----------------------------*/
 #include "CglPreProcess.hpp"
 #include "CglCutGenerator.hpp"
 #include "CglGomory.hpp"
@@ -655,6 +660,14 @@ void CbcSolver::fillParameters()
   parameters_[whichParam(CBC_PARAM_STR_RENS, parameters_)].setCurrentOption("off");
   parameters_[whichParam(CBC_PARAM_STR_LOCALTREE, parameters_)].setCurrentOption("off");
   parameters_[whichParam(CBC_PARAM_STR_COSTSTRATEGY, parameters_)].setCurrentOption("off");
+  /*----------SAMUEL_BRITO----------*/
+  parameters_[whichParam(CBC_PARAM_STR_AGGRCLIQUECUTS, parameters_)].setCurrentOption("off");
+  parameters_[whichParam(CBC_PARAM_STR_USRODDHOLECUTS, parameters_)].setCurrentOption("off");
+  parameters_[whichParam(CBC_PARAM_STR_EXTKNAPSACKCUTS, parameters_)].setCurrentOption("off");
+  parameters_[whichParam(CBC_PARAM_INT_MAXITBK, parameters_)].setIntValue(1000);
+  parameters_[whichParam(CBC_PARAM_INT_MAXITBKEXT, parameters_)].setIntValue(100);
+  parameters_[whichParam(CBC_PARAM_INT_CLQEXTMETHOD, parameters_)].setIntValue(3);
+  /*-----------------------------*/
   if (createSolver)
     delete clpSolver;
 }
@@ -1306,6 +1319,9 @@ int CbcMain1 (int argc, const char *argv[],
   bool useSignalHandler = parameterData.useSignalHandler_;
   CbcModel & model_ = model;
   CglPreProcess * preProcessPointer=NULL;
+  /*----------SAMUEL_BRITO----------*/
+  bool useCustomSep = false;
+  /*-----------------------------*/
 #ifdef CBC_THREAD_SAFE
   // Initialize argument
   int whichArgument=1;
@@ -1750,6 +1766,16 @@ int CbcMain1 (int argc, const char *argv[],
     // set default action (0=off,1=on,2=root)
     // Off 
     int GMIAction = 0;
+
+    /*----------SAMUEL_BRITO----------*/
+    CglAggressiveClique aggrCliqueGen;
+    int aggrCliqueAction = 0;
+    //CglUsrOddHole usrOddHoleGen;
+    int usrOddHoleAction = 0;
+    //CglExtKnapsack extKnapsackGen;
+    int extKnapsackAction = 0;
+    int maxItBK = 1000, maxItBKExt = 100, clqExtMethod = 3;
+    /*-----------------------------*/
 
     CglFakeClique cliqueGen(NULL, false);
     //CglClique cliqueGen(false,true);
@@ -2253,6 +2279,14 @@ int CbcMain1 (int argc, const char *argv[],
                   parameters_[iParam].type() == CBC_PARAM_INT_FPUMPTUNE2 ||
                   parameters_[iParam].type() == CBC_PARAM_INT_FPUMPITS)
                 pumpChanged = true;
+              /*----------SAMUEL_BRITO----------*/
+              else if (parameters_[iParam].type() == CBC_PARAM_INT_MAXITBK)
+                  maxItBK = value;
+              else if (parameters_[iParam].type() == CBC_PARAM_INT_MAXITBKEXT)
+                  maxItBKExt = value;
+              else if (parameters_[iParam].type() == CBC_PARAM_INT_CLQEXTMETHOD)
+                  clqExtMethod = value;
+              /*-----------------------------*/
               else if (parameters_[iParam].type() == CBC_PARAM_INT_EXPERIMENT) {
                 int addFlags=0;
                 // switch on some later features if >999
@@ -2575,6 +2609,20 @@ int CbcMain1 (int argc, const char *argv[],
               case CBC_PARAM_STR_SOS:
                 doSOS = action;
                 break;
+              /*----------SAMUEL_BRITO----------*/
+              case CBC_PARAM_STR_AGGRCLIQUECUTS:
+                  defaultSettings = false; // user knows what she is doing
+                  aggrCliqueAction = action;
+                  break;
+              case CBC_PARAM_STR_USRODDHOLECUTS:
+                  defaultSettings = false; // user knows what she is doing
+                  usrOddHoleAction = action;
+                  break;
+              case CBC_PARAM_STR_EXTKNAPSACKCUTS:
+                  defaultSettings = false; // user knows what she is doing
+                  extKnapsackAction = action;
+                  break;
+              /*-----------------------------*/
               case CBC_PARAM_STR_GOMORYCUTS:
                 defaultSettings = false; // user knows what she is doing
                 gomoryAction = action;
@@ -2647,6 +2695,11 @@ int CbcMain1 (int argc, const char *argv[],
                 flowAction = action;
                 mixedAction = action;
                 twomirAction = action;
+                /*----------SAMUEL_BRITO----------*/
+                aggrCliqueAction = action;
+                usrOddHoleAction = action;
+                extKnapsackAction = action;
+                /*-----------------------------*/
                 //landpAction = action;
                 parameters_[whichParam(CBC_PARAM_STR_GOMORYCUTS, parameters_)].setCurrentOption(action);
                 parameters_[whichParam(CBC_PARAM_STR_PROBINGCUTS, parameters_)].setCurrentOption(action);
@@ -2655,6 +2708,11 @@ int CbcMain1 (int argc, const char *argv[],
                 parameters_[whichParam(CBC_PARAM_STR_FLOWCUTS, parameters_)].setCurrentOption(action);
                 parameters_[whichParam(CBC_PARAM_STR_MIXEDCUTS, parameters_)].setCurrentOption(action);
                 parameters_[whichParam(CBC_PARAM_STR_TWOMIRCUTS, parameters_)].setCurrentOption(action);
+                /*----------SAMUEL_BRITO----------*/
+                parameters_[whichParam(CBC_PARAM_STR_AGGRCLIQUECUTS, parameters_)].setCurrentOption(action);
+                parameters_[whichParam(CBC_PARAM_STR_USRODDHOLECUTS, parameters_)].setCurrentOption(action);
+                parameters_[whichParam(CBC_PARAM_STR_EXTKNAPSACKCUTS, parameters_)].setCurrentOption(action);
+                /*-----------------------------*/
                 if (!action) {
                   zerohalfAction = action;
                   parameters_[whichParam(CBC_PARAM_STR_ZEROHALFCUTS, parameters_)].setCurrentOption(action);
@@ -3540,6 +3598,22 @@ int CbcMain1 (int argc, const char *argv[],
                         ClpSimplex * clpModel = osiclpModel->getModelPtr();
 
                         // Set changed values
+                        int numCutGens = 0;
+                        /*----------SAMUEL_BRITO----------*/
+                        CglAggressiveClique aggrClique;
+                        aggrClique.setMaxItBK(maxItBK);
+                        aggrClique.setMaxItBKExt(maxItBKExt);
+                        aggrClique.setExtendingMethod(clqExtMethod);
+                        cbcModel->addCutGenerator(&aggrClique, -98, "AggressiveClique", true, false, false, -100, -1, -1);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
+                        /*CglUsrOddHole usrOddHole;
+                        cbcModel->addCutGenerator(&usrOddHole, -98, "UserOddHole", true, false, false, -100, -1, -1);
+                        cbcModel->cutGenerator(1)->setTiming(true);
+                        CglExtKnapsack extKnp;
+                        extKnp.setMaxItBK(maxItBKExt);
+                        cbcModel->addCutGenerator(&extKnp, -98, "ExtendedKnapsackCover", true, false, false, -100, -1, -1);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);*/
+                        /*-----------------------------*/
 
                         CglProbing probing;
                         probing.setMaxProbe(10);
@@ -3550,40 +3624,40 @@ int CbcMain1 (int argc, const char *argv[],
                         probing.setRowCuts(3);
                         probing.setUsingObjective(true);
                         cbcModel->addCutGenerator(&probing, -1, "Probing", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(0)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglGomory gomory;
                         gomory.setLimitAtRoot(512);
                         cbcModel->addCutGenerator(&gomory, -98, "Gomory", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(1)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglKnapsackCover knapsackCover;
                         cbcModel->addCutGenerator(&knapsackCover, -98, "KnapsackCover", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(2)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglRedSplit redSplit;
                         cbcModel->addCutGenerator(&redSplit, -99, "RedSplit", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(3)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglClique clique;
                         clique.setStarCliqueReport(false);
                         clique.setRowCliqueReport(false);
                         clique.setMinViolation(0.1);
                         cbcModel->addCutGenerator(&clique, -98, "Clique", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(4)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglMixedIntegerRounding2 mixedIntegerRounding2;
                         cbcModel->addCutGenerator(&mixedIntegerRounding2, -98, "MixedIntegerRounding2", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(5)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglFlowCover flowCover;
                         cbcModel->addCutGenerator(&flowCover, -98, "FlowCover", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(6)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CglTwomir twomir;
                         twomir.setMaxElements(250);
                         cbcModel->addCutGenerator(&twomir, -99, "Twomir", true, false, false, -100, -1, -1);
-                        cbcModel->cutGenerator(7)->setTiming(true);
+                        cbcModel->cutGenerator(numCutGens++)->setTiming(true);
 
                         CbcHeuristicFPump heuristicFPump(*cbcModel);
                         heuristicFPump.setWhen(13);
@@ -4357,6 +4431,10 @@ int CbcMain1 (int argc, const char *argv[],
                       bool keepPPN = parameters_[whichParam(CBC_PARAM_STR_PREPROCNAMES, parameters_)].currentOptionAsInteger();
                       process.setKeepColumnNames( keepPPN );
                       process.setTimeLimit( babModel_->getMaximumSeconds()-babModel_->getCurrentSeconds(), babModel_->useElapsedTime() );
+                      /*----------SAMUEL_BRITO----------*/
+                      useCustomSep = (aggrCliqueAction || extKnapsackAction || usrOddHoleAction);
+                      saveSolver->setUseCG(useCustomSep);
+                      /*-----------------------------*/
                       solver2 = process.preProcessNonDefault(*saveSolver, translate[preProcess], numberPasses,
                           tunePreProcess);
                       if (solver2) {
@@ -5325,6 +5403,27 @@ int CbcMain1 (int argc, const char *argv[],
                   accuracyFlag[numberGenerators] = 5;
                   switches[numberGenerators++] = 0;
                 }
+                /*----------SAMUEL_BRITO----------*/
+                if (aggrCliqueAction) {
+                  aggrCliqueGen.setMaxItBK(maxItBK);
+                    aggrCliqueGen.setMaxItBKExt(maxItBKExt);
+                    aggrCliqueGen.setExtendingMethod(clqExtMethod);
+                    babModel_->addCutGenerator(&aggrCliqueGen, translate[aggrCliqueAction], "AggressiveClique");
+                    accuracyFlag[numberGenerators] = 0;
+                    switches[numberGenerators++] = 0;
+                }
+                if (usrOddHoleAction) {
+                    /*babModel_->addCutGenerator(&usrOddHoleGen, translate[usrOddHoleAction], "UserOddHole");
+                    accuracyFlag[numberGenerators] = 0;
+                    switches[numberGenerators++] = 0;*/
+                }
+                if (extKnapsackAction) {
+                    /*extKnapsackGen.setMaxItBK(maxItBKExt);
+                    babModel_->addCutGenerator(&extKnapsackGen, translate[extKnapsackAction], "Extended Knapsack");
+                    accuracyFlag[numberGenerators] = 1;
+                    switches[numberGenerators++] = -2;*/
+                }
+                /*-----------------------------*/
                 if (cliqueAction) {
                   babModel_->addCutGenerator(&cliqueGen, translate[cliqueAction], "Clique");
                   accuracyFlag[numberGenerators] = 0;
@@ -10511,6 +10610,17 @@ int CbcMain1 (int argc, const char *argv[],
   //generalMessageHandler->message(CLP_GENERAL, generalMessages)
   //<< generalPrint
   //<< CoinMessageEol;
+
+  /*----------SAMUEL_BRITO----------*/
+  if(useCustomSep) {
+      printf("Conflict graph built %d times spending %.2lf seconds\n", OsiSolverInterface::countCG, OsiSolverInterface::cgTime);
+      printf("Clique separation spent %.2lf seconds and generated %d cuts\n", CglAggressiveClique::sepTime, CglAggressiveClique::sepCuts);
+      //printf("Knapsack separation spent %.2lf seconds and generated %d cuts\n", CglExtKnapsack::knpSepTime, CglExtKnapsack::knpSepCuts);
+      //printf("One-Row-CG separation spent %.2lf seconds and generated %d cuts\n", CglExtKnapsack::cgSepTime, CglExtKnapsack::cgSepCuts);
+      //printf("CG+KNP separation spent %.2lf seconds\n", CglExtKnapsack::knpCGSepTime);
+      //printf("Odd Hole separation spent %.2lf seconds and generated %d cuts\n", CglUsrOddHole::sepTime, CglUsrOddHole::sepCuts);
+  }
+  /*-----------------------------*/
   return 0;
 }
 
@@ -10642,6 +10752,14 @@ void CbcMain0 (CbcModel  & model,
   parameters[whichParam(CBC_PARAM_INT_THREADS, parameters)].setIntValue(0);
 #endif
   // Set up likely cut generators and defaults
+  /*----------SAMUEL_BRITO----------*/
+  parameters[whichParam(CBC_PARAM_STR_AGGRCLIQUECUTS, parameters)].setCurrentOption("off");
+  parameters[whichParam(CBC_PARAM_STR_USRODDHOLECUTS, parameters)].setCurrentOption("off");
+  parameters[whichParam(CBC_PARAM_STR_EXTKNAPSACKCUTS, parameters)].setCurrentOption("off");
+  parameters[whichParam(CBC_PARAM_INT_MAXITBK, parameters)].setIntValue(1000);
+  parameters[whichParam(CBC_PARAM_INT_MAXITBKEXT, parameters)].setIntValue(100);
+  parameters[whichParam(CBC_PARAM_INT_CLQEXTMETHOD, parameters)].setIntValue(3);
+  /*-----------------------------*/
   parameters[whichParam(CBC_PARAM_STR_PREPROCESS, parameters)].setCurrentOption("sos");
   parameters[whichParam(CBC_PARAM_INT_MIPOPTIONS, parameters)].setIntValue(1057);
   parameters[whichParam(CBC_PARAM_INT_CUTPASSINTREE, parameters)].setIntValue(1);
