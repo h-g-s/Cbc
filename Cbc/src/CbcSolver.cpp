@@ -4430,7 +4430,9 @@ int CbcMain1 (int argc, const char *argv[],
                       redoSOS=true;
                       bool keepPPN = parameters_[whichParam(CBC_PARAM_STR_PREPROCNAMES, parameters_)].currentOptionAsInteger();
                       process.setKeepColumnNames( keepPPN );
+                      bool mergeCliques = (parameters_[whichParam(CBC_PARAM_STR_MERGECLIQUES, parameters_)].currentOption().compare("on")==0);
                       process.setTimeLimit( babModel_->getMaximumSeconds()-babModel_->getCurrentSeconds(), babModel_->useElapsedTime() );
+                      process.setMergeCliques(mergeCliques);
                       /*----------SAMUEL_BRITO----------*/
                       useCustomSep = (aggrCliqueAction || extKnapsackAction || usrOddHoleAction);
                       saveSolver->setUseCG(useCustomSep);
