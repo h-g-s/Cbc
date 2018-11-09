@@ -1320,7 +1320,7 @@ int CbcMain1 (int argc, const char *argv[],
   CbcModel & model_ = model;
   CglPreProcess * preProcessPointer=NULL;
   /*----------SAMUEL_BRITO----------*/
-  bool useCustomSep = false;
+  bool useCGraph = false;
   /*-----------------------------*/
 #ifdef CBC_THREAD_SAFE
   // Initialize argument
@@ -4434,8 +4434,8 @@ int CbcMain1 (int argc, const char *argv[],
                       process.setTimeLimit( babModel_->getMaximumSeconds()-babModel_->getCurrentSeconds(), babModel_->useElapsedTime() );
                       process.setMergeCliques(mergeCliques);
                       /*----------SAMUEL_BRITO----------*/
-                      useCustomSep = (aggrCliqueAction || extKnapsackAction || usrOddHoleAction);
-                      saveSolver->setUseCG(useCustomSep);
+                      useCGraph = (aggrCliqueAction || extKnapsackAction || usrOddHoleAction || mergeCliques);
+                      saveSolver->setUseCG(useCGraph);
                       /*-----------------------------*/
                       solver2 = process.preProcessNonDefault(*saveSolver, translate[preProcess], numberPasses,
                           tunePreProcess);
@@ -10614,7 +10614,7 @@ int CbcMain1 (int argc, const char *argv[],
   //<< CoinMessageEol;
 
   /*----------SAMUEL_BRITO----------*/
-  if(useCustomSep) {
+  if(useCGraph) {
       printf("Conflict graph built %d times spending %.2lf seconds\n", OsiSolverInterface::countCG, OsiSolverInterface::cgTime);
       printf("Clique separation spent %.2lf seconds and generated %d cuts\n", CglAggressiveClique::sepTime, CglAggressiveClique::sepCuts);
       //printf("Knapsack separation spent %.2lf seconds and generated %d cuts\n", CglExtKnapsack::knpSepTime, CglExtKnapsack::knpSepCuts);
