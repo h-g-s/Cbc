@@ -185,7 +185,7 @@ static int initialPumpTune = -1;
 /*----------SAMUEL_BRITO----------*/
 #include "CglAggressiveClique.hpp"
 //#include "CglExtKnapsack.hpp"
-//#include "CglUsrOddHole.hpp"
+#include "CglUsrOddHole.hpp"
 /*----------------------------*/
 #include "CglPreProcess.hpp"
 #include "CglCutGenerator.hpp"
@@ -1770,7 +1770,7 @@ int CbcMain1 (int argc, const char *argv[],
     /*----------SAMUEL_BRITO----------*/
     CglAggressiveClique aggrCliqueGen;
     int aggrCliqueAction = 0;
-    //CglUsrOddHole usrOddHoleGen;
+    CglUsrOddHole usrOddHoleGen;
     int usrOddHoleAction = 0;
     //CglExtKnapsack extKnapsackGen;
     int extKnapsackAction = 0;
@@ -3606,10 +3606,10 @@ int CbcMain1 (int argc, const char *argv[],
                         aggrClique.setExtendingMethod(clqExtMethod);
                         cbcModel->addCutGenerator(&aggrClique, -98, "AggressiveClique", true, false, false, -100, -1, -1);
                         cbcModel->cutGenerator(numCutGens++)->setTiming(true);
-                        /*CglUsrOddHole usrOddHole;
+                        CglUsrOddHole usrOddHole;
                         cbcModel->addCutGenerator(&usrOddHole, -98, "UserOddHole", true, false, false, -100, -1, -1);
                         cbcModel->cutGenerator(1)->setTiming(true);
-                        CglExtKnapsack extKnp;
+                        /*CglExtKnapsack extKnp;
                         extKnp.setMaxItBK(maxItBKExt);
                         cbcModel->addCutGenerator(&extKnp, -98, "ExtendedKnapsackCover", true, false, false, -100, -1, -1);
                         cbcModel->cutGenerator(numCutGens++)->setTiming(true);*/
@@ -5415,9 +5415,9 @@ int CbcMain1 (int argc, const char *argv[],
                     switches[numberGenerators++] = 0;
                 }
                 if (usrOddHoleAction) {
-                    /*babModel_->addCutGenerator(&usrOddHoleGen, translate[usrOddHoleAction], "UserOddHole");
+                    babModel_->addCutGenerator(&usrOddHoleGen, translate[usrOddHoleAction], "UserOddHole");
                     accuracyFlag[numberGenerators] = 0;
-                    switches[numberGenerators++] = 0;*/
+                    switches[numberGenerators++] = 0;
                 }
                 if (extKnapsackAction) {
                     /*extKnapsackGen.setMaxItBK(maxItBKExt);
@@ -10620,7 +10620,7 @@ int CbcMain1 (int argc, const char *argv[],
       //printf("Knapsack separation spent %.2lf seconds and generated %d cuts\n", CglExtKnapsack::knpSepTime, CglExtKnapsack::knpSepCuts);
       //printf("One-Row-CG separation spent %.2lf seconds and generated %d cuts\n", CglExtKnapsack::cgSepTime, CglExtKnapsack::cgSepCuts);
       //printf("CG+KNP separation spent %.2lf seconds\n", CglExtKnapsack::knpCGSepTime);
-      //printf("Odd Hole separation spent %.2lf seconds and generated %d cuts\n", CglUsrOddHole::sepTime, CglUsrOddHole::sepCuts);
+      printf("Odd Hole separation spent %.2lf seconds and generated %d cuts\n", CglUsrOddHole::sepTime, CglUsrOddHole::sepCuts);
   }
   /*-----------------------------*/
   return 0;
