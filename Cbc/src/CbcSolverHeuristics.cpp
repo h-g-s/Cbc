@@ -1720,3 +1720,6 @@ int doHeuristics(CbcModel *model, int type, std::vector< CbcOrClpParam > paramet
     return 0;
   }
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

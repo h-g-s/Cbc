@@ -291,7 +291,7 @@ public:
   // For time
   double totalTime_;
   // Parameters
-  std::vector< CbcOrClpParam > parameters_;
+  std::vector<CbcOrClpParam> parameters_;
   // Printing
   bool noPrinting_;
   // Whether to use signal handler
