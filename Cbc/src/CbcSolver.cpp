@@ -4502,7 +4502,7 @@ int CbcMain1(int argc, const char *argv[],
                   } else {
                     //strcpy(name,lpSolver->problemName().c_str());
                     int iParam;
-                    for (iParam = 0; iParam < numberParameters_; iParam++) {
+                    for (iParam = 0; iParam < (int)parameters_.size(); iParam++) {
                       int match = parameters_[iParam].matches("import");
                       if (match == 1)
                         break;
@@ -6113,8 +6113,7 @@ int CbcMain1(int argc, const char *argv[],
                             << CoinMessageEol;
                         }
                       }
-                      int sosPriorityOption = intValueOfOption(parameterData,
-                        CBC_PARAM_STR_SOSPRIORITIZE);
+                      int sosPriorityOption = parameters_[whichParam(CBC_PARAM_STR_SOSPRIORITIZE, parameters_)].intValue();
                       if (sosPriorityOption) {
                         const char *msg[4] = {
                           "high with equal priority",
