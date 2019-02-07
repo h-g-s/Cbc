@@ -806,6 +806,10 @@ static void statistics(ClpSimplex *originalModel, ClpSimplex *model);
 static bool maskMatches(const int *starts, char **masks,
   std::string &check);
 static void generateCode(CbcModel *model, const char *fileName, int type, int preProcess);
+#ifdef COIN_HAS_NTY
+// returns number of constraints added
+static int nautiedConstraints(CbcModel &model, int maxPass);
+#endif
 
 // dummy fake main programs for UserClp and UserCbc
 void fakeMain(ClpSimplex &model, OsiSolverInterface &osiSolver, CbcModel &babSolver);
@@ -959,6 +963,8 @@ static int dummyCallBack(CbcModel * /*model*/, int /*whereFrom*/)
 
 int CbcOrClpRead_mode = 1;
 FILE *CbcOrClpReadCommand = stdin;
+// Alternative to environment
+extern char *alternativeEnvironment;
 extern int CbcOrClpEnvironmentIndex;
 
 int callCbc1(const char *input2, CbcModel &model,
@@ -2035,7 +2041,7 @@ int CbcMain1(int argc, const char *argv[],
           int maxAcross = 10;
           if ((verbose % 4) != 0)
             maxAcross = 1;
-          int limits[] = { 1, 51, 101, 151, 201, 251, 301, 351, 401 };
+          int limits[] = { 1, 51, 101, 151, 201, 301, 401, 501, 601 };
           std::vector< std::string > types;
           types.push_back("Double parameters:");
           types.push_back("Branch and Cut double parameters:");
