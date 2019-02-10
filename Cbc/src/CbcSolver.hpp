@@ -463,6 +463,7 @@ private:
 #pragma message("WARNING: this compiler does not checks for deprecated functions")
 #define DEPRECATED(func) func
 #endif
+#endif
 
 /* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
 */
