@@ -1,4 +1,4 @@
-/* $Id: CbcSolverHeuristics.cpp 2344 2017-09-29 11:14:01Z forrest $ */
+/* $Id: CbcSolverHeuristics.cpp 2479 2019-02-07 19:50:37Z unxusr $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).

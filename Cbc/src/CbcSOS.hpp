@@ -1,4 +1,4 @@
-// $Id$
+// $Id: CbcSOS.hpp 2465 2019-01-03 19:26:52Z unxusr $
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -152,7 +152,7 @@ public:
     integerValued_ = yesNo;
   }
 
-private:
+protected:
   /// data
 
   /// Members (indices in range 0 ... numberColumns-1)
@@ -271,7 +271,7 @@ public:
   /** Fill out the \c firstNonzero_ and \c lastNonzero_ data members */
   void computeNonzeroRange();
 
-private:
+protected:
   /// data
   const CbcSOS *set_;
   /// separator
@@ -285,3 +285,6 @@ private:
   int lastNonzero_;
 };
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

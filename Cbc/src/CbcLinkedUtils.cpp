@@ -2,7 +2,7 @@
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
-/* $Id$ */
+/* $Id: CbcLinkedUtils.cpp 2465 2019-01-03 19:26:52Z unxusr $ */
 
 /*! \file CbcAugmentClpSimplex.cpp
     \brief Hooks to Ampl (for CbcLinked)
@@ -820,3 +820,6 @@ int ClpSimplex::loadNonLinear(void *, int &,
   return 0;
 }
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

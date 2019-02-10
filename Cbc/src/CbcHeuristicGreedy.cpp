@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcHeuristicGreedy.cpp 2467 2019-01-03 21:26:29Z unxusr $ */
 // Copyright (C) 2005, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -1853,3 +1853,6 @@ void CbcHeuristicGreedySOS::validate()
       setWhen(0); // switch off
   }
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

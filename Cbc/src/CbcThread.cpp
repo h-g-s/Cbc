@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcThread.cpp 2467 2019-01-03 21:26:29Z unxusr $ */
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -1456,6 +1456,25 @@ void CbcModel::moveToModel(CbcModel *baseModel, int mode)
     lockThread();
     CbcThread *stuff = reinterpret_cast< CbcThread * >(masterThread_);
     assert(stuff);
+    // deal with hotstart
+    static int lastHotDepth = -1;
+    if (baseModel->hotstartSolution_) {
+      if (!baseModel->numberNodes_) {
+        lastHotDepth = -1;
+      } else if (stuff->node()) {
+        if (stuff->node()->depth() >= lastHotDepth) {
+          lastHotDepth = stuff->node()->depth();
+          //printf("hotdepth %d\n",lastHotDepth);
+        } else {
+          // switch off
+          delete[] hotstartSolution_;
+          hotstartSolution_ = NULL;
+          delete[] baseModel->hotstartSolution_;
+          baseModel->hotstartSolution_ = NULL;
+          //printf("off hotstart\n");
+        }
+      }
+    }
     //stateOfSearch_
     if (stuff->saveStuff()[0] != searchStrategy_) {
 #ifdef COIN_DEVELOP
@@ -1971,3 +1990,6 @@ CbcBaseModel::CbcBaseModel() {}
 
 bool CbcModel::haveMultiThreadSupport() { return false; }
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

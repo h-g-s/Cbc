@@ -4,7 +4,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGenParamUtils.cpp 2467 2019-01-03 21:26:29Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -34,7 +34,7 @@
 
 namespace {
 
-char svnid[] = "$Id$";
+char svnid[] = "$Id: CbcGenParamUtils.cpp 2467 2019-01-03 21:26:29Z unxusr $";
 
 }
 
@@ -1440,3 +1440,6 @@ bool readSolution(std::string fileName,
 }
 
 } // end namespace CbcGenParamUtils
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

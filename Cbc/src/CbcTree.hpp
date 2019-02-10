@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcTree.hpp 2467 2019-01-03 21:26:29Z unxusr $ */
 // Copyright (C) 2004, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -488,3 +488,6 @@ protected:
 };
 #endif
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

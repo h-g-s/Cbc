@@ -1,4 +1,4 @@
-/* $Id: CbcModel.hpp 2373 2018-05-18 09:45:54Z forrest $ */
+/* $Id: CbcModel.hpp 2476 2019-01-27 20:51:34Z unxusr $ */
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -2596,11 +2596,15 @@ public:
   {
     maximumNumberIterations_ = value;
   }
+#ifdef COIN_HAS_NTY
   /// Symmetry information
   inline CbcSymmetry *symmetryInfo() const
   {
     return symmetryInfo_;
   }
+  /// get rid of all
+  void zapSymmetry();
+#endif
   /// Set depth for fast nodes
   inline void setFastNodeDepth(int value)
   {
@@ -2691,9 +2695,22 @@ public:
     this->mipStart_ = mips;
   }
 
+  /** if original column names will be preserved in preprocessed problem
+   */
+  void setKeepNamesPreproc( bool _keep ) 
+  {
+    this->keepNamesPreproc = _keep;
+  }
+
+  bool getKeepNamesPreproc() const 
+  {
+    return keepNamesPreproc;
+  }
+
   /** may be safer to use this overload method: c++ string libraries 
      * implementation may not be binary compatible */
   void setMIPStart(int count, const char **colNames, const double colValues[]);
+
 
   const std::vector< std::pair< std::string, double > > &getMIPStart()
   {
@@ -2778,6 +2795,13 @@ private:
       values for integer variables which will be converted to a complete integer initial feasible solution
     */
   std::vector< std::pair< std::string, double > > mipStart_;
+
+  /** keepNamesPreproc
+   *  if variables names will be preserved in the pre-processed problem
+   *  (usefull in callbacks)
+   **/
+  bool keepNamesPreproc;
+
   /** Warm start object produced by heuristic or strong branching
 
         If get a valid integer solution outside branch and bound then it can take
@@ -3234,21 +3258,20 @@ int callCbc(const std::string input2, OsiClpSolverInterface &solver1);
 int callCbc(const std::string input2);
 // When we want to load up CbcModel with options first
 void CbcMain0(CbcModel &babSolver);
-
-//int CbcMain1 (int argc, const char *argv[], CbcModel & babSolver);
+int CbcMain1(int argc, const char *argv[], CbcModel &babSolver);
 // two ways of calling
 int callCbc(const char *input2, CbcModel &babSolver);
 int callCbc(const std::string input2, CbcModel &babSolver);
 // And when CbcMain0 already called to initialize
-
-// removing non thread safe callCbc1 methods
-//int callCbc1(const char * input2, CbcModel & babSolver);
-//int callCbc1(const std::string input2, CbcModel & babSolver);
+int callCbc1(const char *input2, CbcModel &babSolver);
+int callCbc1(const std::string input2, CbcModel &babSolver);
 // And when CbcMain0 already called to initialize (with call back) (see CbcMain1 for whereFrom)
-//int callCbc1(const char * input2, CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
-//int callCbc1(const std::string input2, CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
-//int CbcMain1 (int argc, const char *argv[], CbcModel & babSolver, int (CbcModel * currentSolver, int whereFrom));
+int callCbc1(const char *input2, CbcModel &babSolver, int(CbcModel *currentSolver, int whereFrom));
+int callCbc1(const std::string input2, CbcModel &babSolver, int(CbcModel *currentSolver, int whereFrom));
+int CbcMain1(int argc, const char *argv[], CbcModel &babSolver, int(CbcModel *currentSolver, int whereFrom));
 // For uniform setting of cut and heuristic options
 void setCutAndHeuristicOptions(CbcModel &model);
-
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

@@ -1,4 +1,4 @@
-/* $Id: CoinSolve.cpp 2345 2017-10-03 11:36:45Z forrest $ */
+/* $Id: CoinSolve.cpp 2479 2019-02-07 19:50:37Z unxusr $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -383,4 +383,7 @@ int main(int argc, const char *argv[])
   Version 1.01.00 February 2 2006
   Added first try at Ampl interface
   Made dummy program so real main can be called from other programs
+*/
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
 */

@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: Cbc_ampl.cpp 2467 2019-01-03 21:26:29Z unxusr $ */
 /****************************************************************
 Copyright (C) 1997-2000 Lucent Technologies
 Modifications for Coin -  Copyright (C) 2006, International Business Machines Corporation and others.
@@ -1523,3 +1523,6 @@ void writeAmpl(ampl_info *)
 {
 }
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

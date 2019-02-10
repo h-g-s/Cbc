@@ -4,7 +4,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGenBaB.cpp 2467 2019-01-03 21:26:29Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -37,7 +37,7 @@
 
 namespace {
 
-char svnid[] = "$Id$";
+char svnid[] = "$Id: CbcGenBaB.cpp 2467 2019-01-03 21:26:29Z unxusr $";
 
 /*
   A hack to fix variables based on reduced cost prior to branch-and-cut. Note
@@ -880,3 +880,6 @@ int doBaCParam(CoinParam *param)
 }
 
 } // end namespace CbcGenParamutils
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

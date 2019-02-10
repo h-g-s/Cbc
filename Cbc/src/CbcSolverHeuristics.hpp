@@ -1,4 +1,4 @@
-/* $Id: CbcSolverHeuristics.hpp 1899 2013-04-09 18:12:08Z stefan $ */
+/* $Id: CbcSolverHeuristics.hpp 2479 2019-02-07 19:50:37Z unxusr $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -40,3 +40,6 @@ int doHeuristics(CbcModel *model, int type, std::vector< CbcOrClpParam > paramet
   int noPrinting_, int initialPumpTune);
 
 #endif //CbcSolverHeuristics_H
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

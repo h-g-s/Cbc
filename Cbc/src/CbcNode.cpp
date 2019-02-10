@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcNode.cpp 2467 2019-01-03 21:26:29Z unxusr $ */
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -581,7 +581,7 @@ int CbcNode::chooseBranch(CbcModel *model, CbcNode *lastNode, int numberPassesLe
   model->reserveCurrentSolution(saveSolution);
   if (hotstartSolution) {
     numberStrong = 0;
-    if ((model->moreSpecialOptions() & 1024) != 0) {
+    if ((model->moreSpecialOptions() & 1024) != 0 || true) {
       int nBad = 0;
       int nUnsat = 0;
       int nDiff = 0;
@@ -1614,7 +1614,7 @@ int CbcNode::chooseDynamicBranch(CbcModel *model, CbcNode *lastNode,
   else
     depth_ = 0;
   // Go to other choose if hot start
-  if (model->hotstartSolution() && (((model->moreSpecialOptions() & 1024) == 0) || false))
+  if (model->hotstartSolution() && (((model->moreSpecialOptions() & 1024) == 0) || true))
     return -3;
   delete branch_;
   branch_ = NULL;
@@ -1728,7 +1728,7 @@ int CbcNode::chooseDynamicBranch(CbcModel *model, CbcNode *lastNode,
   const int *hotstartPriorities = model->hotstartPriorities();
   double integerTolerance = model->getDblParam(CbcModel::CbcIntegerTolerance);
   if (hotstartSolution) {
-    if ((model->moreSpecialOptions() & 1024) != 0) {
+    if ((model->moreSpecialOptions() & 1024) != 0 || true) {
       int nBad = 0;
       int nUnsat = 0;
       int nDiff = 0;
@@ -6084,3 +6084,6 @@ CbcNode::checkIsCutoff(double cutoff)
   branch_->checkIsCutoff(cutoff);
   return objectiveValue_;
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

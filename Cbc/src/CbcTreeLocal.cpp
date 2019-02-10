@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcTreeLocal.cpp 2467 2019-01-03 21:26:29Z unxusr $ */
 // Copyright (C) 2004, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -1730,3 +1730,6 @@ void CbcTreeVariable::generateCpp(FILE *fp)
     fprintf(fp, "5  variableTree.setRefine(%s);\n", refine_ ? "true" : "false");
   fprintf(fp, "5  cbcModel->passInTreeHandler(variableTree);\n");
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

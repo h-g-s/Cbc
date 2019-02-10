@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcSolverExpandKnapsack.hpp 2465 2019-01-03 19:26:52Z unxusr $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -22,3 +22,6 @@ void afterKnapsack(const CoinModel &coinModel2, const int *whichColumn, const in
   const double *knapsackSolution, double *solution, int logLevel);
 
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

@@ -4,7 +4,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGenOsiParam.cpp 2465 2019-01-03 19:26:52Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -29,7 +29,7 @@
 
 namespace {
 
-char svnid[] = "$Id$";
+char svnid[] = "$Id: CbcGenOsiParam.cpp 2465 2019-01-03 19:26:52Z unxusr $";
 
 }
 
@@ -158,3 +158,6 @@ CbcOsiParam &CbcOsiParam::operator=(const CbcOsiParam &rhs)
 CbcOsiParam::~CbcOsiParam()
 { /* Nothing more to do */
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

@@ -1,4 +1,4 @@
-// $Id$
+// $Id: CbcBranchToFixLots.cpp 2467 2019-01-03 21:26:29Z unxusr $
 // Copyright (C) 2004, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -561,3 +561,6 @@ void CbcBranchToFixLots::redoSequenceEtc(CbcModel *model, int numberColumns, con
   OsiSolverInterface *solver = model_->solver();
   matrixByRow_ = *solver->getMatrixByRow();
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

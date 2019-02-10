@@ -4,7 +4,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGenParam.hpp 2465 2019-01-03 19:26:52Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -19,7 +19,7 @@
 */
 
 /*
-  $Id$
+  $Id: CbcGenParam.hpp 2465 2019-01-03 19:26:52Z unxusr $
 */
 
 class CbcGenCtlBlk;
@@ -264,3 +264,6 @@ int pushCbcGenCutParam(CoinParam *param);
 }
 
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

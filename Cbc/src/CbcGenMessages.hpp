@@ -19,7 +19,7 @@
 */
 
 /*
-  $Id$
+  $Id: CbcGenMessages.hpp 2465 2019-01-03 19:26:52Z unxusr $
 */
 
 /*
@@ -40,3 +40,6 @@ typedef enum {
 } CbcGenMsgCode;
 
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

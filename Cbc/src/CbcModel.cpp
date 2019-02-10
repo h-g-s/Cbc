@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcModel.cpp 2485 2019-02-09 20:03:28Z unxusr $ */
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -1996,10 +1996,13 @@ void CbcModel::branchAndBound(int doStatistics)
     OsiClpSolverInterface *clpSolver
       = dynamic_cast< OsiClpSolverInterface * >(solver_);
     if (clpSolver) {
+      if ( this->keepNamesPreproc == false )
+        solver_->setIntParam( OsiNameDiscipline, 0 );
       ClpSimplex *clpSimplex = clpSolver->getModelPtr();
       if ((specialOptions_ & 32) == 0) {
         // take off names (unless going to be saving)
-        if (numberAnalyzeIterations_ >= 0 || (-numberAnalyzeIterations_ & 64) == 0)
+        int nameDisc; solver_->getIntParam( OsiNameDiscipline, nameDisc );
+        if ( (numberAnalyzeIterations_ >= 0 || (-numberAnalyzeIterations_ & 64) == 0) && (!nameDisc) )
           clpSimplex->dropNames();
       }
       // no crunch if mostly continuous
@@ -3626,7 +3629,7 @@ void CbcModel::branchAndBound(int doStatistics)
     }
 #define HOTSTART -1
 #if HOTSTART < 0
-    if (bestSolution_ && !parentModel_ && !hotstartSolution_ && (moreSpecialOptions_ & 1024) != 0) {
+    if (bestSolution_ && !parentModel_ && !hotstartSolution_ && (moreSpecialOptions_ & 1024) != 0 && (specialOptions_ & 2048) == 0) {
       // Set priorities so only branch on ones we need to
       // use djs and see if only few branches needed
 #ifndef NDEBUG
@@ -5639,6 +5642,7 @@ CbcModel::CbcModel()
   , numberGlobalCutsIn_(0)
   , master_(NULL)
   , masterThread_(NULL)
+  , keepNamesPreproc(false)
 {
   memset(intParam_, 0, sizeof(intParam_));
   intParam_[CbcMaxNumNode] = 2147483647;
@@ -5812,6 +5816,7 @@ CbcModel::CbcModel(const OsiSolverInterface &rhs)
   , numberGlobalCutsIn_(0)
   , master_(NULL)
   , masterThread_(NULL)
+  , keepNamesPreproc(false)
 {
   memset(intParam_, 0, sizeof(intParam_));
   intParam_[CbcMaxNumNode] = 2147483647;
@@ -6098,6 +6103,7 @@ CbcModel::CbcModel(const CbcModel &rhs, bool cloneHandler)
   , numberGlobalCutsIn_(rhs.numberGlobalCutsIn_)
   , master_(NULL)
   , masterThread_(NULL)
+  , keepNamesPreproc(rhs.keepNamesPreproc)
 {
   memcpy(intParam_, rhs.intParam_, sizeof(intParam_));
   memcpy(dblParam_, rhs.dblParam_, sizeof(dblParam_));
@@ -6614,6 +6620,8 @@ CbcModel::operator=(const CbcModel &rhs)
     phase_ = rhs.phase_;
     currentNumberCuts_ = rhs.currentNumberCuts_;
     maximumDepth_ = rhs.maximumDepth_;
+    keepNamesPreproc = rhs.keepNamesPreproc;
+    mipStart_ = rhs.mipStart_;
     delete[] addedCuts_;
     delete[] walkback_;
     // These are only used as temporary arrays so need not be filled
@@ -19302,6 +19310,14 @@ void CbcModel::setMIPStart(int count, const char **colNames, const double colVal
   for (int i = 0; (i < count); ++i)
     mipStart_.push_back(std::pair< std::string, double >(std::string(colNames[i]), colValues[i]));
 }
+#ifdef COIN_HAS_NTY
+// get rid of all
+void CbcModel::zapSymmetry()
+{
+  delete symmetryInfo_;
+  symmetryInfo_ = NULL;
+}
+#endif
 /* Add SOS info to solver -
    Overwrites SOS information in solver with information
    in CbcModel.  Has no effect with some solvers. 
@@ -19529,3 +19545,6 @@ CbcModel::postProcessedSolver(int solutionType)
   }
   return originalModel;
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

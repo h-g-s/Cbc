@@ -5,7 +5,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGenMessages.cpp 2465 2019-01-03 19:26:52Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -17,7 +17,7 @@
 
 namespace {
 
-char svnid[] = "$Id$";
+char svnid[] = "$Id: CbcGenMessages.cpp 2465 2019-01-03 19:26:52Z unxusr $";
 
 }
 
@@ -193,3 +193,6 @@ CoinMessageHandler &CbcGenCtlBlk::message(CbcGenMsgCode inID)
 
   return (*msgHandler_);
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

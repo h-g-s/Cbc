@@ -4,7 +4,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGenCtlBlk.hpp 2467 2019-01-03 21:26:29Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -47,7 +47,7 @@
 */
 
 /*
-  $Id$
+  $Id: CbcGenCtlBlk.hpp 2467 2019-01-03 21:26:29Z unxusr $
 */
 
 #define CBC_GENERIC_VERSION "00.01.00"
@@ -997,3 +997,6 @@ private:
 };
 
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

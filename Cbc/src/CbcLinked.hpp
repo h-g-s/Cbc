@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcLinked.hpp 2465 2019-01-03 19:26:52Z unxusr $ */
 // Copyright (C) 2006, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -353,7 +353,7 @@ public:
     double multiplier = 1.0);
   //@}
 
-private:
+protected:
   typedef struct {
     double multiplier; // to use in computation
     int affected; // variable or element affected
@@ -432,7 +432,6 @@ public:
     return true;
   }
 
-protected:
 private:
   /// Illegal Assignment operator
   CbcHeuristicDynamic3 &operator=(const CbcHeuristicDynamic3 &rhs);
@@ -522,7 +521,7 @@ public:
     return false;
   }
 
-private:
+protected:
   /// data
 
   /// Number of links
@@ -674,7 +673,7 @@ public:
     return false;
   }
 
-private:
+protected:
   /// data
   /// Current increment for y points
   double meshSize_;
@@ -1064,7 +1063,7 @@ public:
     */
   virtual bool boundBranch() const;
 
-private:
+protected:
   /// data
   /// 1 means branch on x, 2 branch on y
   short chosen_;
@@ -1120,7 +1119,7 @@ public:
     numberPoints_ = value;
   }
 
-private:
+protected:
   /// Number of points
   int numberPoints_;
 };
@@ -1439,3 +1438,6 @@ ClpSimplex *approximateSolution(CoinModel &coinModel,
   int numberPasses, double deltaTolerance,
   int mode = 0);
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

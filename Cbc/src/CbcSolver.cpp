@@ -1,11 +1,11 @@
-/* $Id: CbcSolver.cpp 2382 2018-09-03 13:09:44Z forrest $ */
+/* $Id: CbcSolver.cpp 2485 2019-02-09 20:03:28Z unxusr $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 /*! \file CbcSolver.cpp
-  \brief Second level routines for the cbc stand-alone solver.
-  */
+    \brief Second level routines for the cbc stand-alone solver.
+*/
 
 #include "CbcConfig.h"
 #include "CoinPragma.hpp"
@@ -53,6 +53,7 @@
 #include "OsiChooseVariable.hpp"
 #include "OsiAuxInfo.hpp"
 #include "CbcMipStartIO.hpp"
+#include "CbcMessage.hpp"
 // for printing
 #ifndef CLP_OUTPUT_FORMAT
 #define CLP_OUTPUT_FORMAT % 15.8g
@@ -93,7 +94,6 @@ static int malloc_amount[] = { 0, 32, 128, 256, 1024, 4096, 16384, 65536, 262144
 static int malloc_n = 10;
 double malloc_counts[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 bool malloc_counts_on = true;
-
 void *operator new(size_t size) throw(std::bad_alloc)
 {
   malloc_times++;
@@ -246,8 +246,8 @@ extern int debugNumberColumns;
 //#define IN_BRANCH_AND_BOUND (0x01000000|262144|128)
 
 /*
-   CbcStopNow class definitions.
-   */
+  CbcStopNow class definitions.
+*/
 
 CbcStopNow::CbcStopNow()
 {
@@ -275,8 +275,8 @@ CbcStopNow::clone() const
 }
 
 /*
-   CbcUser class definitions.
-   */
+  CbcUser class definitions.
+*/
 
 // User stuff (base class)
 CbcUser::CbcUser()
@@ -337,8 +337,8 @@ static void putBackOtherSolutions(CbcModel *presolvedModel, CbcModel *model,
 }
 
 /*
-   CbcSolver class definitions
-   */
+  CbcSolver class definitions
+*/
 
 CbcSolver::CbcSolver()
   : babModel_(NULL)
@@ -420,6 +420,7 @@ CbcSolver::CbcSolver(const CbcSolver &rhs)
   , noPrinting_(rhs.noPrinting_)
   , readMode_(rhs.readMode_)
 {
+  fillParameters();
   if (rhs.babModel_)
     babModel_ = new CbcModel(*rhs.babModel_);
   userFunction_ = new CbcUser *[numberUserFunctions_];
@@ -673,14 +674,14 @@ void CbcSolver::fillParameters()
 }
 
 /*
-   Initialise a subset of the parameters prior to processing any input from
-   the user.
+  Initialise a subset of the parameters prior to processing any input from
+  the user.
 
-   Why this choice of subset?
-   */
+  Why this choice of subset?
+*/
 /*!
   \todo Guard/replace clp-specific code
-  */
+*/
 void CbcSolver::fillValuesInSolver()
 {
   OsiSolverInterface *solver = model_.solver();
@@ -689,16 +690,16 @@ void CbcSolver::fillValuesInSolver()
   ClpSimplex *lpSolver = clpSolver->getModelPtr();
 
   /*
-     Why are we reaching into the underlying solver(s) for these settings?
-     Shouldn't CbcSolver have its own defaults, which are then imposed on the
-     underlying solver?
+      Why are we reaching into the underlying solver(s) for these settings?
+      Shouldn't CbcSolver have its own defaults, which are then imposed on the
+      underlying solver?
 
-     Coming at if from the other side, if CbcSolver had the capability to use
-     multiple solvers then it definitely makes sense to acquire the defaults from
-     the solver (on the assumption that we haven't processed command line
-     parameters yet, which can then override the defaults). But then it's more of
-     a challenge to avoid solver-specific coding here.
-     */
+      Coming at if from the other side, if CbcSolver had the capability to use
+      multiple solvers then it definitely makes sense to acquire the defaults from
+      the solver (on the assumption that we haven't processed command line
+      parameters yet, which can then override the defaults). But then it's more of
+      a challenge to avoid solver-specific coding here.
+    */
   noPrinting_ = (lpSolver->logLevel() == 0);
   CoinMessageHandler *generalMessageHandler = clpSolver->messageHandler();
   generalMessageHandler->setPrefix(true);
@@ -781,14 +782,14 @@ void CbcSolver::addCutGenerator(CglCutGenerator *generator)
 }
 
 /*
-   The only other solver that's ever been used is cplex, and the use is
-   limited -- do the root with clp and all the cbc smarts, then give the
-   problem over to cplex to finish. Although the defines can be read in some
-   places to allow other options, nothing's been tested and success is
-   unlikely.
+  The only other solver that's ever been used is cplex, and the use is
+  limited -- do the root with clp and all the cbc smarts, then give the
+  problem over to cplex to finish. Although the defines can be read in some
+  places to allow other options, nothing's been tested and success is
+  unlikely.
 
-   CBC_OTHER_SOLVER == 1 is cplex.
-   */
+  CBC_OTHER_SOLVER == 1 is cplex.
+*/
 
 #if CBC_OTHER_SOLVER == 1
 #ifndef COIN_HAS_CPX
@@ -846,12 +847,12 @@ static void signal_handler_error(int whichSignal)
 #endif
 
 /*
-   Debug checks on special ordered sets.
+  Debug checks on special ordered sets.
 
-   This is active only for debugging. The entire body of the routine becomes
-   a noop when COIN_DEVELOP is not defined. To avoid compiler warnings, the
-   formal parameters also need to go away.
-   */
+  This is active only for debugging. The entire body of the routine becomes
+  a noop when COIN_DEVELOP is not defined. To avoid compiler warnings, the
+  formal parameters also need to go away.
+*/
 #ifdef COIN_DEVELOP
 void checkSOS(CbcModel *babModel, const OsiSolverInterface *solver)
 #else
@@ -955,11 +956,11 @@ static int dummyCallBack(CbcModel * /*model*/, int /*whereFrom*/)
 }
 
 /*
-   Global parameters for command processing.
+  Global parameters for command processing.
 
-   These will need to be moved into an object of some sort in order to make
-   this set of calls thread-safe.
-   */
+  These will need to be moved into an object of some sort in order to make
+  this set of calls thread-safe.
+*/
 
 int CbcOrClpRead_mode = 1;
 FILE *CbcOrClpReadCommand = stdin;
@@ -972,13 +973,13 @@ int callCbc1(const char *input2, CbcModel &model,
   CbcSolverUsefulData &parameterData);
 
 /*
-   Wrappers for CbcMain0, CbcMain1. The various forms of callCbc will eventually
-   resolve to a call to CbcMain0 followed by a call to callCbc1.
-   */
+  Wrappers for CbcMain0, CbcMain1. The various forms of callCbc will eventually
+  resolve to a call to CbcMain0 followed by a call to callCbc1.
+*/
 /*
-   Simplest calling form: supply just a string with the command options. The
-   wrapper creates an OsiClpSolverInterface and calls the next wrapper.
-   */
+  Simplest calling form: supply just a string with the command options. The
+  wrapper creates an OsiClpSolverInterface and calls the next wrapper.
+*/
 int callCbc(const std::string input2)
 {
   char *input3 = CoinStrdup(input2.c_str());
@@ -997,9 +998,9 @@ int callCbc(const char *input2)
 }
 
 /*
-   Second calling form: supply the command line and an OsiClpSolverInterface.
-   the wrapper will create a CbcModel and call the next wrapper.
-   */
+  Second calling form: supply the command line and an OsiClpSolverInterface.
+  the wrapper will create a CbcModel and call the next wrapper.
+*/
 
 int callCbc(const std::string input2, OsiClpSolverInterface &solver1)
 {
@@ -1016,10 +1017,10 @@ int callCbc(const char *input2, OsiClpSolverInterface &solver1)
 }
 
 /*
-   Third calling form: supply the command line and a CbcModel. This wrapper will
-   actually call CbcMain0 and then call the next set of wrappers (callCbc1) to
-   handle the call to CbcMain1.
-   */
+  Third calling form: supply the command line and a CbcModel. This wrapper will
+  actually call CbcMain0 and then call the next set of wrappers (callCbc1) to
+  handle the call to CbcMain1.
+*/
 int callCbc(const char *input2, CbcModel &babSolver)
 {
   CbcSolverUsefulData data;
@@ -1045,13 +1046,13 @@ int callCbc(const std::string input2, CbcModel &babSolver)
 }
 
 /*
-   Various overloads of callCbc1. The first pair accepts just a CbcModel and
-   supplements it with a dummy callback routine. The second pair allows the
-   user to supply a callback. See CbcMain1 for further explanation of the
-   callback. The various overloads of callCbc1 resolve to the final version,
-   which breaks the string into individual parameter strings (i.e., creates
-   something that looks like a standard argv vector).
-   */
+  Various overloads of callCbc1. The first pair accepts just a CbcModel and
+  supplements it with a dummy callback routine. The second pair allows the
+  user to supply a callback. See CbcMain1 for further explanation of the
+  callback. The various overloads of callCbc1 resolve to the final version,
+  which breaks the string into individual parameter strings (i.e., creates
+  something that looks like a standard argv vector).
+*/
 
 // Disabling non thread safe overloads
 /*
@@ -1247,7 +1248,7 @@ CbcSolverUsefulData::CbcSolverUsefulData()
 }
 
 /* Copy constructor .
-*/
+ */
 CbcSolverUsefulData::CbcSolverUsefulData(const CbcSolverUsefulData &rhs)
 {
   totalTime_ = rhs.totalTime_;
@@ -1274,14 +1275,14 @@ CbcSolverUsefulData::~CbcSolverUsefulData()
 }
 
 /*
-   Meaning of whereFrom:
-   1 after initial solve by dualsimplex etc
-   2 after preprocessing
-   3 just before branchAndBound (so user can override)
-   4 just after branchAndBound (before postprocessing)
-   5 after postprocessing
-   6 after a user called heuristic phase
-   */
+  Meaning of whereFrom:
+    1 after initial solve by dualsimplex etc
+    2 after preprocessing
+    3 just before branchAndBound (so user can override)
+    4 just after branchAndBound (before postprocessing)
+    5 after postprocessing
+    6 after a user called heuristic phase
+*/
 
 int CbcMain1(int argc, const char *argv[],
   CbcModel &model,
@@ -1295,14 +1296,14 @@ int CbcMain1(int argc, const char *argv[],
 }
 static void printGeneralMessage(CbcModel &model, const char *message);
 /*
-   Meaning of whereFrom:
-   1 after initial solve by dualsimplex etc
-   2 after preprocessing
-   3 just before branchAndBound (so user can override)
-   4 just after branchAndBound (before postprocessing)
-   5 after postprocessing
-   6 after a user called heuristic phase
-   */
+  Meaning of whereFrom:
+    1 after initial solve by dualsimplex etc
+    2 after preprocessing
+    3 just before branchAndBound (so user can override)
+    4 just after branchAndBound (before postprocessing)
+    5 after postprocessing
+    6 after a user called heuristic phase
+*/
 int CbcMain1(int argc, const char *argv[],
   CbcModel &model,
   int callBack(CbcModel *currentSolver, int whereFrom),
@@ -1347,9 +1348,9 @@ int CbcMain1(int argc, const char *argv[],
   int statistics_number_generators = 0;
   memset(statusUserFunction_, 0, numberUserFunctions_ * sizeof(int));
   /* Note
-     This is meant as a stand-alone executable to do as much of coin as possible.
-     It should only have one solver known to it.
-     */
+       This is meant as a stand-alone executable to do as much of coin as possible.
+       It should only have one solver known to it.
+    */
   CoinMessageHandler *generalMessageHandler = model_.messageHandler();
   generalMessageHandler->setPrefix(false);
   int numberLotSizing = 0;
@@ -1471,7 +1472,7 @@ int CbcMain1(int argc, const char *argv[],
             if (equals && atoi(equals + 1) > 0) {
               noPrinting_ = false;
               info.logLevel = atoi(equals + 1);
-              int log = whichParam(CLP_PARAM_INT_LOGLEVEL, numberParameters_, parameters_);
+              int log = whichParam(CLP_PARAM_INT_LOGLEVEL, parameters_);
               parameters_[log].setIntValue(info.logLevel);
               // mark so won't be overWritten
               info.numberRows = -1234567;
@@ -1556,14 +1557,14 @@ int CbcMain1(int argc, const char *argv[],
           si->setDefaultMeshSize(0.001);
           // need some relative granularity
           si->setDefaultBound(100.0);
-          double dextra3 = parameters_[whichParam(CBC_PARAM_DBL_DEXTRA3, numberParameters_, parameters_)].doubleValue();
+          double dextra3 = parameters_[whichParam(CBC_PARAM_DBL_DEXTRA3, parameters_)].doubleValue();
           if (dextra3)
             si->setDefaultMeshSize(dextra3);
           si->setDefaultBound(100000.0);
           si->setIntegerPriority(1000);
           si->setBiLinearPriority(10000);
           CoinModel *model2 = reinterpret_cast< CoinModel * >(coinModel);
-          int logLevel = parameters_[whichParam(CLP_PARAM_INT_LOGLEVEL, numberParameters_, parameters_)].intValue();
+          int logLevel = parameters_[whichParam(CLP_PARAM_INT_LOGLEVEL, parameters_)].intValue();
           si->load(*model2, true, logLevel);
           // redo
           solver = model_.solver();
@@ -1571,7 +1572,7 @@ int CbcMain1(int argc, const char *argv[],
           lpSolver = clpSolver->getModelPtr();
           clpSolver->messageHandler()->setLogLevel(0);
           testOsiParameters = 0;
-          parameters_[whichParam(CBC_PARAM_INT_TESTOSI, numberParameters_, parameters_)].setIntValue(0);
+          parameters_[whichParam(CBC_PARAM_INT_TESTOSI, parameters_)].setIntValue(0);
           complicatedInteger = 1;
           if (info.cut) {
             printf("Sorry - can't do cuts with LOS as ruins delicate row order\n");
@@ -3008,46 +3009,46 @@ int CbcMain1(int argc, const char *argv[],
               {
                 // map states
                 /* clp status
-                     -1 - unknown e.g. before solve or if postSolve says not optimal
-                     0 - optimal
-                     1 - primal infeasible
-                     2 - dual infeasible
-                     3 - stopped on iterations or time
-                     4 - stopped due to errors
-                     5 - stopped by event handler (virtual int ClpEventHandler::event()) */
+                                   -1 - unknown e.g. before solve or if postSolve says not optimal
+                                   0 - optimal
+                                   1 - primal infeasible
+                                   2 - dual infeasible
+                                   3 - stopped on iterations or time
+                                   4 - stopped due to errors
+                                   5 - stopped by event handler (virtual int ClpEventHandler::event()) */
                 /* cbc status
-                     -1 before branchAndBound
-                     0 finished - check isProvenOptimal or isProvenInfeasible to see if solution found
-                     (or check value of best solution)
-                     1 stopped - on maxnodes, maxsols, maxtime
-                     2 difficulties so run was abandoned
-                     (5 event user programmed event occurred) */
+                                   -1 before branchAndBound
+                                   0 finished - check isProvenOptimal or isProvenInfeasible to see if solution found
+                                   (or check value of best solution)
+                                   1 stopped - on maxnodes, maxsols, maxtime
+                                   2 difficulties so run was abandoned
+                                   (5 event user programmed event occurred) */
                 /* clp secondary status of problem - may get extended
-                     0 - none
-                     1 - primal infeasible because dual limit reached OR probably primal
-                     infeasible but can't prove it (main status 4)
-                     2 - scaled problem optimal - unscaled problem has primal infeasibilities
-                     3 - scaled problem optimal - unscaled problem has dual infeasibilities
-                     4 - scaled problem optimal - unscaled problem has primal and dual infeasibilities
-                     5 - giving up in primal with flagged variables
-                     6 - failed due to empty problem check
-                     7 - postSolve says not optimal
-                     8 - failed due to bad element check
-                     9 - status was 3 and stopped on time
-                     100 up - translation of enum from ClpEventHandler
-                     */
+                                   0 - none
+                                   1 - primal infeasible because dual limit reached OR probably primal
+                                   infeasible but can't prove it (main status 4)
+                                   2 - scaled problem optimal - unscaled problem has primal infeasibilities
+                                   3 - scaled problem optimal - unscaled problem has dual infeasibilities
+                                   4 - scaled problem optimal - unscaled problem has primal and dual infeasibilities
+                                   5 - giving up in primal with flagged variables
+                                   6 - failed due to empty problem check
+                                   7 - postSolve says not optimal
+                                   8 - failed due to bad element check
+                                   9 - status was 3 and stopped on time
+                                   100 up - translation of enum from ClpEventHandler
+                                */
                 /* cbc secondary status of problem
-                     -1 unset (status_ will also be -1)
-                     0 search completed with solution
-                     1 linear relaxation not feasible (or worse than cutoff)
-                     2 stopped on gap
-                     3 stopped on nodes
-                     4 stopped on time
-                     5 stopped on user event
-                     6 stopped on solutions
-                     7 linear relaxation unbounded
-                     8 stopped on iterations limit
-                     */
+                                   -1 unset (status_ will also be -1)
+                                   0 search completed with solution
+                                   1 linear relaxation not feasible (or worse than cutoff)
+                                   2 stopped on gap
+                                   3 stopped on nodes
+                                   4 stopped on time
+                                   5 stopped on user event
+                                   6 stopped on solutions
+                                   7 linear relaxation unbounded
+                                   8 stopped on iterations limit
+                                */
                 int iStatus = model2->status();
                 int iStatus2 = model2->secondaryStatus();
                 if (iStatus == 0) {
@@ -3324,9 +3325,9 @@ int CbcMain1(int argc, const char *argv[],
                 // Just ones which affect >= extra3
                 int extra3 = parameters_[whichParam(CBC_PARAM_INT_EXTRA3, parameters_)].intValue();
                 /* 2 is cost above which to fix if feasible
-                     3 is fraction of integer variables fixed if relaxing (0.97)
-                     4 is fraction of all variables fixed if relaxing (0.0)
-                     */
+                                   3 is fraction of integer variables fixed if relaxing (0.97)
+                                   4 is fraction of all variables fixed if relaxing (0.0)
+                                */
                 double dextra[6];
                 int extra[5];
                 extra[1] = parameters_[whichParam(CBC_PARAM_INT_EXTRA1, parameters_)].intValue();
@@ -3448,9 +3449,9 @@ int CbcMain1(int argc, const char *argv[],
             goodModel = true;
             parameters_[whichParam(CBC_PARAM_INT_MULTIPLEROOTS, parameters_)].setIntValue(0);
             /*
-                 Run branch-and-cut. First set a few options -- node comparison, scaling.
-                 Print elapsed time at the end.
-                 */
+                          Run branch-and-cut. First set a few options -- node comparison, scaling.
+                          Print elapsed time at the end.
+                        */
           case CBC_PARAM_ACTION_BAB: // branchAndBound
             // obsolete case STRENGTHEN:
             if (goodModel) {
@@ -3784,7 +3785,9 @@ int CbcMain1(int argc, const char *argv[],
                 model_.setProblemStatus(iStatus);
                 model_.setSecondaryStatus(iStatus2);
                 si->setWarmStart(NULL);
-                int returnCode = callBack(&model_, 1);
+                int returnCode = 0;
+                if (callBack != NULL)
+                  callBack(&model_, 1);
                 if (returnCode) {
                   // exit if user wants
                   delete babModel_;
@@ -4048,8 +4051,8 @@ int CbcMain1(int argc, const char *argv[],
                 if (preProcess == 0 && numberLotSizing) {
                   if (!babModel_->numberObjects()) {
                     /* model may not have created objects
-                         If none then create
-                         */
+				       If none then create
+				    */
                     babModel_->findIntegers(true);
                   }
                   // Lotsizing
@@ -4099,7 +4102,7 @@ int CbcMain1(int argc, const char *argv[],
               if (preProcess && type == CBC_PARAM_ACTION_BAB) {
                 saveSolver = babModel_->solver()->clone();
                 /* Do not try and produce equality cliques and
-                     do up to 10 passes */
+                                   do up to 10 passes */
                 OsiSolverInterface *solver2;
                 {
                   // Tell solver we are in Branch and Cut
@@ -4288,8 +4291,8 @@ int CbcMain1(int argc, const char *argv[],
                   }
                   if (!model_.numberObjects() && true) {
                     /* model may not have created objects
-                         If none then create
-                         */
+                                           If none then create
+                                        */
                     model_.findIntegers(true);
                   }
                   // Lotsizing
@@ -4463,7 +4466,9 @@ int CbcMain1(int argc, const char *argv[],
                   model_.setProblemStatus(-1);
                   babModel_->setProblemStatus(-1);
                 }
-                int returnCode = callBack(babModel_, 2);
+                int returnCode = 0;
+                if (callBack != NULL)
+                  returnCode = callBack(babModel_, 2);
                 if (returnCode) {
                   // exit if user wants
                   delete babModel_;
@@ -4616,10 +4621,10 @@ int CbcMain1(int argc, const char *argv[],
                   bool modifiedModel = false;
                   int highPriority = 0;
                   /*
-                       normal - no priorities
-                       >10000 equal high priority
-                       >20000 higher priority for higher cost
-                       */
+				    normal - no priorities
+				    >10000 equal high priority
+				    >20000 higher priority for higher cost
+				  */
                   if (threshold > 10000) {
                     highPriority = threshold / 10000;
                     threshold -= 10000 * highPriority;
@@ -5100,12 +5105,12 @@ int CbcMain1(int argc, const char *argv[],
                 if (solver3 || (options & 16) != 0) {
                   if (options) {
                     /*
-                         1 - force mini branch and bound
-                         2 - set priorities high on continuous
-                         4 - try adding OA cuts
-                         8 - try doing quadratic linearization
-                         16 - try expanding knapsacks
-                         */
+                                          1 - force mini branch and bound
+                                          2 - set priorities high on continuous
+                                          4 - try adding OA cuts
+                                          8 - try doing quadratic linearization
+                                          16 - try expanding knapsacks
+                                        */
                     if ((options & 16)) {
                       int numberColumns = saveCoinModel.numberColumns();
                       int numberRows = saveCoinModel.numberRows();
@@ -5907,8 +5912,8 @@ int CbcMain1(int argc, const char *argv[],
                     int numberSOS = process.numberSOS();
                     int numberIntegers = babModel_->numberIntegers();
                     /* model may not have created objects
-                         If none then create
-                         */
+                                           If none then create
+                                        */
                     if (!numberIntegers || !babModel_->numberObjects()) {
                       int type = (pseudoUp) ? 1 : 0;
                       babModel_->findIntegers(true, type);
@@ -6051,8 +6056,8 @@ int CbcMain1(int argc, const char *argv[],
                     // do anyway for priorities etc
                     int numberIntegers = babModel_->numberIntegers();
                     /* model may not have created objects
-                         If none then create
-                         */
+                                           If none then create
+                                        */
                     if (!numberIntegers || !babModel_->numberObjects()) {
                       int type = (pseudoUp) ? 1 : 0;
                       babModel_->findIntegers(true, type);
@@ -6114,6 +6119,7 @@ int CbcMain1(int argc, const char *argv[],
                         }
                       }
                       int sosPriorityOption = parameters_[whichParam(CBC_PARAM_STR_SOSPRIORITIZE, parameters_)].intValue();
+
                       if (sosPriorityOption) {
                         const char *msg[4] = {
                           "high with equal priority",
@@ -6222,8 +6228,8 @@ int CbcMain1(int argc, const char *argv[],
                   // Find if none
                   int numberIntegers = testOsiSolver->getNumIntegers();
                   /* model may not have created objects
-                       If none then create
-                       */
+                                       If none then create
+                                    */
                   if (!numberIntegers || !testOsiSolver->numberObjects()) {
                     //int type = (pseudoUp) ? 1 : 0;
                     testOsiSolver->findIntegers(false);
@@ -6491,14 +6497,14 @@ int CbcMain1(int argc, const char *argv[],
                       if (options) {
                         printf("nlp options %d\n", options);
                         /*
-                             1 - force mini branch and bound
-                             2 - set priorities high on continuous
-                             4 - try adding OA cuts
-                             8 - try doing quadratic linearization
-                             16 - try expanding knapsacks
-                             32 - OA cuts strictly concave
-                             64 - no branching at all on bilinear x-x!
-                             */
+                                                  1 - force mini branch and bound
+                                                  2 - set priorities high on continuous
+                                                  4 - try adding OA cuts
+                                                  8 - try doing quadratic linearization
+                                                  16 - try expanding knapsacks
+                                                              32 - OA cuts strictly concave
+                                                  64 - no branching at all on bilinear x-x!
+                                                */
                         if ((options & 2)) {
                           solver3->setBiLinearPriorities(10, tightenFactor > 0.0 ? tightenFactor : 1.0);
                         } else if (tightenFactor > 0.0) {
@@ -6736,8 +6742,8 @@ int CbcMain1(int argc, const char *argv[],
                       // CbcObjects
                       numberIntegers = babModel_->numberIntegers();
                       /* model may not have created objects
-                           If none then create
-                           */
+                                            If none then create
+                                            */
                       if (!numberIntegers || !babModel_->numberObjects()) {
                         int type = (pseudoUp) ? 1 : 0;
                         babModel_->findIntegers(true, type);
@@ -6749,8 +6755,8 @@ int CbcMain1(int argc, const char *argv[],
                       numberIntegers = testOsiSolver->getNumIntegers();
                       if (!numberIntegers || !testOsiSolver->numberObjects()) {
                         /* model may not have created objects
-                             If none then create
-                             */
+                                                   If none then create
+                                                */
                         testOsiSolver->findIntegers(false);
                         numberIntegers = testOsiSolver->getNumIntegers();
                       }
@@ -6811,7 +6817,9 @@ int CbcMain1(int argc, const char *argv[],
                 babModel_->setNumberThreads(numberThreads % 100);
                 babModel_->setThreadMode(numberThreads / 100);
 #endif
-                int returnCode = callBack(babModel_, 3);
+                int returnCode = 0;
+                if (callBack != NULL)
+                  returnCode = callBack(babModel_, 3);
                 if (returnCode) {
                   // exit if user wants
                   delete babModel_;
@@ -6893,9 +6901,9 @@ int CbcMain1(int argc, const char *argv[],
 #ifdef SOS_AS_CUTS
 #ifdef COIN_HAS_CLP
                 /* SOS as cuts
-                     Could be a bit more sophisticated e.g. only non duplicates
-                     Could do something for SOS 2?
-                     */
+				   Could be a bit more sophisticated e.g. only non duplicates
+				   Could do something for SOS 2?
+				*/
                 {
                   OsiClpSolverInterface *clpSolver = dynamic_cast< OsiClpSolverInterface * >(babModel_->solver());
                   if (clpSolver && clpSolver->numberSOS()) {
@@ -6918,13 +6926,13 @@ int CbcMain1(int argc, const char *argv[],
                     // need to get rid of sos
                     ClpSimplex *fakeSimplex = new ClpSimplex(*clpSolver->getModelPtr());
 #if 0
-                      int numberRows=fakeSimplex->numberRows();
-                      int * starts =
-                        new int[CoinMax(numberSOS+1,numberRows)];
-                      int * columns = new int[nEls];
-                      for (int i=0;i<numberRows;i++)
-                        starts[i]=i;
-                      fakeSimplex->deleteRows(numberRows,starts);
+				    int numberRows=fakeSimplex->numberRows();
+				    int * starts =
+				      new int[CoinMax(numberSOS+1,numberRows)];
+				    int * columns = new int[nEls];
+				    for (int i=0;i<numberRows;i++)
+				      starts[i]=i;
+				    fakeSimplex->deleteRows(numberRows,starts);
 #else
                     int *starts = new int[numberSOS + 1];
                     int *columns = new int[nEls];
@@ -7394,7 +7402,9 @@ int CbcMain1(int argc, const char *argv[],
                 void printHistory(const char *file /*,CbcModel * model*/);
                 printHistory("branch.log" /*,babModel_*/);
 #endif
-                returnCode = callBack(babModel_, 4);
+                returnCode = 0;
+                if (callBack != NULL)
+                  returnCode = callBack(babModel_, 4);
                 if (returnCode) {
                   // exit if user wants
                   model_.moveInfo(*babModel_);
@@ -7469,8 +7479,8 @@ int CbcMain1(int argc, const char *argv[],
                 }
 #endif
                 /* LL: this was done in CoinSolve.cpp: main(argc, argv).
-                     I have moved it here so that the miplib directory location
-                     could be passed to CbcClpUnitTest. */
+                                   I have moved it here so that the miplib directory location
+                                   could be passed to CbcClpUnitTest. */
                 /* JJF: No need to have 777 flag at all - user
                      says -miplib
                      */
@@ -8005,7 +8015,9 @@ int CbcMain1(int argc, const char *argv[],
                     << generalPrint
                     << CoinMessageEol;
                 }
-                int returnCode = callBack(babModel_, 5);
+                int returnCode = 0;
+                if (callBack != NULL)
+                  returnCode = callBack(babModel_, 5);
                 if (returnCode) {
                   // exit if user wants
                   model_.moveInfo(*babModel_);
@@ -8925,7 +8937,7 @@ int CbcMain1(int argc, const char *argv[],
                           break;
                         }
                         switch (order[i]) {
-                        // name
+                          // name
                         case 0:
                           iColumn++;
                           for (; iColumn < numberColumns; iColumn++) {
@@ -9543,7 +9555,7 @@ int CbcMain1(int argc, const char *argv[],
               // set time from integer model
               double timeToGo = model_.getMaximumSeconds();
               lpSolver->setMaximumSeconds(timeToGo);
-              int extra1 = parameters_[whichParam(CBC_PARAM_INT_EXTRA1, numberParameters_, parameters_)].intValue();
+              int extra1 = parameters_[whichParam(CBC_PARAM_INT_EXTRA1, parameters_)].intValue();
               fakeMain2(*lpSolver, *clpSolver, extra1);
               lpSolver = clpSolver->getModelPtr();
 #ifdef COIN_HAS_ASL
@@ -10105,7 +10117,7 @@ clp watson.mps -\nscaling off\nprimalsimplex");
                     number = 0;
                   }
                   switch (printMode) {
-                  // bound ranging
+                    // bound ranging
                   case 6:
                     fprintf(fp, "Bound ranging");
                     break;
@@ -10166,7 +10178,7 @@ clp watson.mps -\nscaling off\nprimalsimplex");
                   double *valueDecrease = new double[number];
                   int *sequenceDecrease = new int[number];
                   switch (printMode) {
-                  // bound or rhs ranging
+                    // bound or rhs ranging
                   case 6:
                   case 7:
                     solver->primalRanging(numberRows,
@@ -10786,8 +10798,8 @@ void CbcMain0(CbcModel &model,
 }
 
 /*
-   Routines to print statistics.
-   */
+  Routines to print statistics.
+*/
 static void breakdown(const char *name, int numberLook, const double *region)
 {
   double range[] = {
@@ -11091,8 +11103,8 @@ static void statistics(ClpSimplex *originalModel, ClpSimplex *model)
   memset(number, 0, (numberRows + 1) * sizeof(int));
   int numberObjSingletons = 0;
   /* cType
-     0 0/inf, 1 0/up, 2 lo/inf, 3 lo/up, 4 free, 5 fix, 6 -inf/0, 7 -inf/up,
-     8 0/1
+        0 0/inf, 1 0/up, 2 lo/inf, 3 lo/up, 4 free, 5 fix, 6 -inf/0, 7 -inf/up,
+        8 0/1
      */
   int cType[9];
   std::string cName[] = { "0.0->inf,", "0.0->up,", "lo->inf,", "lo->up,", "free,", "fixed,", "-inf->0.0,",
@@ -11134,8 +11146,8 @@ static void statistics(ClpSimplex *originalModel, ClpSimplex *model)
     }
   }
   /* rType
-     0 E 0, 1 E 1, 2 E -1, 3 E other, 4 G 0, 5 G 1, 6 G other,
-     7 L 0,  8 L 1, 9 L other, 10 Range 0/1, 11 Range other, 12 free
+        0 E 0, 1 E 1, 2 E -1, 3 E other, 4 G 0, 5 G 1, 6 G other,
+        7 L 0,  8 L 1, 9 L other, 10 Range 0/1, 11 Range other, 12 free
      */
   int rType[13];
   std::string rName[] = { "E 0.0,", "E 1.0,", "E -1.0,", "E other,", "G 0.0,", "G 1.0,", "G other,",
@@ -12657,31 +12669,31 @@ static int nautiedConstraints(CbcModel &model, int maxPass)
 }
 #endif
 /*
-   Version 1.00.00 November 16 2005.
-   This is to stop me (JJF) messing about too much.
-   Tuning changes should be noted here.
-   The testing next version may be activated by CBC_NEXT_VERSION
-   This applies to OsiClp, Clp etc
-   Version 1.00.01 November 24 2005
-   Added several classes for advanced users.  This can't affect code (if you don't use it)
-   Made some tiny changes (for N way branching) which should not change anything.
-   CbcNWay object class - for N way branching this also allows use of CbcConsequence class.
-   CbcBranchAllDifferent object class - for branching on general integer variables
-   to stop them having same value so branches are x >= y+1 and x <= y-1.
-   Added two new Cgl classes - CglAllDifferent which does column fixing (too slowly)
-   and CglStored which just has a list of cuts which can be activated.
-   Modified preprocess option to SOS
-   Version 1.00.02 December 9 2005
-   Added use of CbcStrategy to do clean preprocessing
-   Added use of referenceSolver for cleaner repetition of Cbc
-   Version 1.01.00 February 2 2006
-   Added first try at Ampl interface
-   Version 1.04 June 2007
-   Goes parallel
-   Version 2.00 September 2007
-   Improvements to feaspump
-   Source code changes so up to 2.0
-   */
+  Version 1.00.00 November 16 2005.
+  This is to stop me (JJF) messing about too much.
+  Tuning changes should be noted here.
+  The testing next version may be activated by CBC_NEXT_VERSION
+  This applies to OsiClp, Clp etc
+  Version 1.00.01 November 24 2005
+  Added several classes for advanced users.  This can't affect code (if you don't use it)
+  Made some tiny changes (for N way branching) which should not change anything.
+  CbcNWay object class - for N way branching this also allows use of CbcConsequence class.
+  CbcBranchAllDifferent object class - for branching on general integer variables
+  to stop them having same value so branches are x >= y+1 and x <= y-1.
+  Added two new Cgl classes - CglAllDifferent which does column fixing (too slowly)
+  and CglStored which just has a list of cuts which can be activated.
+  Modified preprocess option to SOS
+  Version 1.00.02 December 9 2005
+  Added use of CbcStrategy to do clean preprocessing
+  Added use of referenceSolver for cleaner repetition of Cbc
+  Version 1.01.00 February 2 2006
+  Added first try at Ampl interface
+  Version 1.04 June 2007
+  Goes parallel
+  Version 2.00 September 2007
+  Improvements to feaspump
+  Source code changes so up to 2.0
+*/
 
 /* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
 */

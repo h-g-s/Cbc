@@ -4,7 +4,7 @@
 
   This code is licensed under the terms of the Eclipse Public License (EPL).
 
-  $Id$
+  $Id: CbcGeneric.cpp 2467 2019-01-03 21:26:29Z unxusr $
 */
 /*
   This file is part of cbc-generic.
@@ -65,7 +65,7 @@
 
 namespace {
 
-char svnid[] = "$Id$";
+char svnid[] = "$Id: CbcGeneric.cpp 2467 2019-01-03 21:26:29Z unxusr $";
 
 }
 
@@ -416,3 +416,6 @@ int main(int argc, const char *argv[])
     */
   return (0);
 }
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

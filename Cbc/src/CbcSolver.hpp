@@ -1,18 +1,18 @@
-/* $Id: CbcSolver.hpp 1998 2013-12-19 18:11:05Z forrest $ */
+/* $Id: CbcSolver.hpp 2479 2019-02-07 19:50:37Z unxusr $ */
 // Copyright (C) 2007, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
 
 /*! \file CbcSolver.hpp
-  \brief Defines CbcSolver, the proposed top-level class for the new-style
-  cbc solver.
+    \brief Defines CbcSolver, the proposed top-level class for the new-style
+    cbc solver.
 
-  This class is currently an orphan. With the removal of all code flagged
-  with the NEW_STYLE_SOLVER, this class is never instantiated (and cannot
-  be instantiated). It is available to be coopted as a top-level object
-  wrapping the current CbcMain0 and CbcMain1, should that appear to be a
-  desireable path forward.  -- lh, 091211 --
-  */
+    This class is currently an orphan. With the removal of all code flagged
+    with the NEW_STYLE_SOLVER, this class is never instantiated (and cannot
+    be instantiated). It is available to be coopted as a top-level object
+    wrapping the current CbcMain0 and CbcMain1, should that appear to be a
+    desireable path forward.  -- lh, 091211 --
+*/
 
 #ifndef CbcSolver_H
 #define CbcSolver_H
@@ -37,20 +37,20 @@ class CglCutGenerator;
 
 /*! \brief This allows the use of the standalone solver in a flexible manner.
 
-  It has an original OsiClpSolverInterface and CbcModel which it can use
-  repeatedly, e.g., to get a heuristic solution and then start again.
+    It has an original OsiClpSolverInterface and CbcModel which it can use
+    repeatedly, e.g., to get a heuristic solution and then start again.
 
-  So I [jjf] will need a primitive scripting language which can then call
-  solve and manipulate solution value and solution arrays.
+    So I [jjf] will need a primitive scripting language which can then call
+    solve and manipulate solution value and solution arrays.
 
-  Also provides for user callback functions. Currently two ideas in
-  gestation, CbcUser and CbcStopNow. The latter seems limited to deciding
-  whether or not to stop. The former seems completely general, with a notion
-  of importing and exporting, and a `solve', which should be interpreted as
-  `do whatever this user function does'.
+    Also provides for user callback functions. Currently two ideas in
+    gestation, CbcUser and CbcStopNow. The latter seems limited to deciding
+    whether or not to stop. The former seems completely general, with a notion
+    of importing and exporting, and a `solve', which should be interpreted as
+    `do whatever this user function does'.
 
-  Parameter initialisation is at last centralised in fillParameters().
-  */
+    Parameter initialisation is at last centralised in fillParameters().
+*/
 
 class CbcSolver {
 
@@ -58,18 +58,18 @@ public:
   ///@name Solve method
   //@{
   /** This takes a list of commands, does "stuff" and returns
-          returnMode -
-          0 model and solver untouched - babModel updated
-          1 model updated - just with solution basis etc
-          2 model updated i.e. as babModel (babModel NULL) (only use without preprocessing)
-          */
+        returnMode -
+        0 model and solver untouched - babModel updated
+        1 model updated - just with solution basis etc
+        2 model updated i.e. as babModel (babModel NULL) (only use without preprocessing)
+    */
   int solve(int argc, const char *argv[], int returnMode);
   /** This takes a list of commands, does "stuff" and returns
-          returnMode -
-          0 model and solver untouched - babModel updated
-          1 model updated - just with solution basis etc
-          2 model updated i.e. as babModel (babModel NULL) (only use without preprocessing)
-          */
+        returnMode -
+        0 model and solver untouched - babModel updated
+        1 model updated - just with solution basis etc
+        2 model updated i.e. as babModel (babModel NULL) (only use without preprocessing)
+    */
   int solve(const char *input, int returnMode);
   //@}
   ///@name Constructors and destructors etc
@@ -84,7 +84,7 @@ public:
   CbcSolver(const CbcModel &);
 
   /** Copy constructor .
-        */
+     */
   CbcSolver(const CbcSolver &rhs);
 
   /// Assignment operator
@@ -96,10 +96,10 @@ public:
   void fillParameters();
   /*! \brief Set default values in solvers from parameters
 
-          Misleading. The current code actually reads default values from
-          the underlying solvers and installs them as default values for a subset of
-          parameters in #parameters_.
-          */
+      Misleading. The current code actually reads default values from
+      the underlying solvers and installs them as default values for a subset of
+      parameters in #parameters_.
+    */
   void fillValuesInSolver();
   /// Add user function
   void addUserFunction(CbcUser *function);
@@ -114,17 +114,17 @@ public:
   int *analyze(OsiClpSolverInterface *solverMod, int &numberChanged, double &increment,
     bool changeInt, CoinMessageHandler *generalMessageHandler);
   /** 1 - add heuristics to model
-          2 - do heuristics (and set cutoff and best solution)
-          3 - for miplib test so skip some
-          (out model later)
-          */
+        2 - do heuristics (and set cutoff and best solution)
+        3 - for miplib test so skip some
+        (out model later)
+    */
   //int doHeuristics(CbcModel * model, int type);
   /** Updates model_ from babModel_ according to returnMode
-          returnMode -
-          0 model and solver untouched - babModel updated
-          1 model updated - just with solution basis etc
-          2 model updated i.e. as babModel (babModel NULL) (only use without preprocessing)
-          */
+        returnMode -
+        0 model and solver untouched - babModel updated
+        1 model updated - just with solution basis etc
+        2 model updated i.e. as babModel (babModel NULL) (only use without preprocessing)
+    */
   void updateModel(ClpSimplex *model2, int returnMode);
   //@}
   ///@name useful stuff
@@ -212,11 +212,11 @@ private:
   /// User functions
   CbcUser **userFunction_;
   /** Status of user functions
-          0 - not used
-          1 - needs cbc_load
-          2 - available - data in coinModel
-          3 - data loaded - can do cbc_save
-          */
+        0 - not used
+        1 - needs cbc_load
+        2 - available - data in coinModel
+        3 - data loaded - can do cbc_save
+    */
   int *statusUserFunction_;
   /// Copy of model on initial load (will contain output solutions)
   OsiClpSolverInterface *originalSolver_;
@@ -263,10 +263,10 @@ typedef struct {
 //#############################################################################
 
 /**
-  The CbcSolver class was taken out at a 9/12/09 meeting
-  This is a feeble replacement.
-  At present everything is public
-  */
+   The CbcSolver class was taken out at a 9/12/09 meeting
+   This is a feeble replacement.
+   At present everything is public
+*/
 class CbcSolverUsefulData {
 
 public:
@@ -276,7 +276,7 @@ public:
   CbcSolverUsefulData();
 
   /** Copy constructor .
-        */
+     */
   CbcSolverUsefulData(const CbcSolverUsefulData &rhs);
 
   /// Assignment operator
@@ -309,8 +309,8 @@ int CbcMain1(int argc, const char *argv[], CbcModel &babSolver, int(CbcModel *cu
 
 /*! \brief A class to allow the use of unknown user functionality
 
-  For example, access to a modelling language (CbcAmpl).
-  */
+    For example, access to a modelling language (CbcAmpl).
+*/
 class CbcUser {
 
 public:
@@ -318,11 +318,11 @@ public:
   //@{
   /*! \brief Import - gets full command arguments
 
-          \return
-          - -1 - no action
-          -  0 - data read in without error
-          -  1 - errors
-          */
+      \return
+      - -1 - no action
+      -  0 - data read in without error
+      -  1 - errors
+    */
   virtual int importData(CbcSolver * /*model*/, int & /*argc*/, char ** /*argv[]*/)
   {
     return -1;
@@ -330,11 +330,11 @@ public:
 
   /*! \brief Export
 
-          Values for mode:
-          - 1 OsiClpSolver
-          - 2 CbcModel
-          - add 10 if infeasible from odd situation
-          */
+      Values for mode:
+      - 1 OsiClpSolver
+      - 2 CbcModel
+      - add 10 if infeasible from odd situation
+    */
   virtual void exportSolution(CbcSolver * /*model*/,
     int /*mode*/, const char * /*message*/ = NULL) {}
 
@@ -404,7 +404,7 @@ protected:
 /*! \brief Support the use of a call back class to decide whether to stop
 
   Definitely under construction.
-  */
+*/
 
 class CbcStopNow {
 
@@ -413,17 +413,17 @@ public:
   //@{
   /*! \brief Import
 
-          Values for whereFrom:
-          - 1 after initial solve by dualsimplex etc
-          - 2 after preprocessing
-          - 3 just before branchAndBound (so user can override)
-          - 4 just after branchAndBound (before postprocessing)
-          - 5 after postprocessing
-          - 6 after a user called heuristic phase
+      Values for whereFrom:
+       - 1 after initial solve by dualsimplex etc
+       - 2 after preprocessing
+       - 3 just before branchAndBound (so user can override)
+       - 4 just after branchAndBound (before postprocessing)
+       - 5 after postprocessing
+       - 6 after a user called heuristic phase
 
-          \return 0 if good
-          nonzero return code to stop
-          */
+      \return 0 if good
+       nonzero return code to stop
+    */
   virtual int callBack(CbcModel * /*currentSolver*/, int /*whereFrom*/)
   {
     return 0;
@@ -436,7 +436,7 @@ public:
   CbcStopNow();
 
   /** Copy constructor .
-        */
+     */
   CbcStopNow(const CbcStopNow &rhs);
 
   /// Assignment operator
@@ -464,4 +464,5 @@ private:
 #define DEPRECATED(func) func
 #endif
 
-#endif
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

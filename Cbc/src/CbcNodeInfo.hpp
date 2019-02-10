@@ -1,4 +1,4 @@
-// $Id$
+// $Id: CbcNodeInfo.hpp 2465 2019-01-03 19:26:52Z unxusr $
 // Copyright (C) 2002, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -372,3 +372,6 @@ private:
 };
 
 #endif // CbcNodeInfo_H
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/

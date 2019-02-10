@@ -1,4 +1,4 @@
-/* $Id$ */
+/* $Id: CbcHeuristicFPump.cpp 2467 2019-01-03 21:26:29Z unxusr $ */
 // Copyright (C) 2004, International Business Machines
 // Corporation and others.  All Rights Reserved.
 // This code is licensed under the terms of the Eclipse Public License (EPL).
@@ -2360,12 +2360,8 @@ int CbcHeuristicFPump::solutionInternal(double &solutionValue,
     const double *colUpper = newSolver->getColUpper();
     int i;
     double rhs = 0.0;
-    for (i = 0; i < numberIntegersOrig; i++) {
-      int iColumn = integerVariableOrig[i];
-#ifdef COIN_HAS_CLP
-      if (!isHeuristicInteger(newSolver, iColumn))
-        continue;
-#endif
+    for (i = 0; i < numberIntegers; i++) {
+      int iColumn = integerVariable[i];
       int direction = closestSolution[i];
       closestSolution[i] = iColumn;
       if (direction == 0) {
@@ -2378,7 +2374,7 @@ int CbcHeuristicFPump::solutionInternal(double &solutionValue,
         lastSolution[i] = -1.0;
       }
     }
-    newSolver->addRow(numberIntegersOrig, closestSolution,
+    newSolver->addRow(numberIntegers, closestSolution,
       lastSolution, -COIN_DBL_MAX, rhs + 10.0);
     //double saveValue = newSolutionValue;
     //newSolver->writeMps("sub");
@@ -3300,3 +3296,6 @@ void CbcDisasterHandler::setCbcModel(CbcModel *model)
   }
 }
 #endif
+
+/* vi: softtabstop=2 shiftwidth=2 expandtab tabstop=2
+*/
