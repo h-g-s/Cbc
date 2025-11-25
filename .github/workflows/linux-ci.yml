@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-22.04, ubuntu-24.04]
+        os: [ubuntu-22.04]
         build_static: [true, false]
         flags: [ADD_CXXFLAGS=-fvisibility=hidden]
         download_requirements: [sudo apt install -y -qq gfortran liblapack-dev libmetis-dev libnauty-dev]
@@ -65,6 +65,14 @@ jobs:
           ADD_CXXFLAGS="${ADD_CXXFLAGS}" CC=${CC} CXX=${CXX}
           [[ ${CC} ]] && CC="${CC}" || CC=""
           echo "CC=${CC}" >> $GITHUB_ENV
+          echo "Building dynamic library from statically linked CBC"
+          ls -l
+          echo "Contents of lib:"
+          ls lib -l
+          ${CC} -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp \
+          -o lib/cbc-c.so -Llib \
+          -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
+          -llapack -lblas -lgfortran -lquadmath -lm
       - name: Archive dist contents
         run: |
           cp ${{ github.event.repository.name }}/README.md dist/
