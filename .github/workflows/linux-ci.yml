@@ -70,7 +70,7 @@ jobs:
           echo "Contents of dist"
           ls dist -l
           g++ -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
-          -o lib/cbc-c.so -L./dist/lib/ -I./dist/include/ \
+          -o lib/cbc-c.so -L./dist/lib/ -I./dist/include/ I./dist/include/coin-or/ \
           -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
           -llapack -lblas -lgfortran -lquadmath -lm
       - name: Archive dist contents
