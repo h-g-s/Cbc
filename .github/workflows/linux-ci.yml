@@ -69,6 +69,8 @@ jobs:
           ls -l
           echo "Contents of dist"
           ls dist -l
+          echo "Finding cointypes"
+          find . -name "CoinTypes.h"
           g++ -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
           -o lib/cbc-c.so -L./dist/lib/ -I./dist/include/ I./dist/include/coin-or/ \
           -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
