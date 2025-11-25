@@ -69,7 +69,7 @@ jobs:
           ls -l
           echo "Contents of lib:"
           ls lib -l
-          ${CC} -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp \
+          ${CC} -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
           -o lib/cbc-c.so -Llib \
           -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
           -llapack -lblas -lgfortran -lquadmath -lm
