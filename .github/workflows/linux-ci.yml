@@ -67,10 +67,10 @@ jobs:
           echo "CC=${CC}" >> $GITHUB_ENV
           echo "Building dynamic library from statically linked CBC"
           ls -l
-          echo "Contents of lib:"
-          ls lib -l
+          echo "Contents of dist"
+          ls dist -l
           ${CC} -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
-          -o lib/cbc-c.so -Llib \
+          -o lib/cbc-c.so -L./dist/lib/ -I./dist/include/ \
           -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
           -llapack -lblas -lgfortran -lquadmath -lm
       - name: Archive dist contents
