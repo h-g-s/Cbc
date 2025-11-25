@@ -71,10 +71,13 @@ jobs:
           ls dist -l
           echo "Finding cointypes"
           find . -name "CoinTypes.h"
-          g++ -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
-          -o lib/cbc-c.so -L./dist/lib/ -I./dist/include/ I./dist/include/coin-or/ \
-          -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
-          -llapack -lblas -lgfortran -lquadmath -lm
+          INC_PATH=`pwd`/dist/include/coin-or/
+          echo "Inc path: $INC_PATH"
+          g++ -fPIC -shared  I${INC_PATH} \
+             ./Cbc/src/Cbc_C_Interface.cpp  \
+              -o lib/cbc-c.so -L./dist/lib/ \
+              -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
+              -llapack -lblas -lgfortran -lquadmath -lm
       - name: Archive dist contents
         run: |
           cp ${{ github.event.repository.name }}/README.md dist/
