@@ -69,7 +69,7 @@ jobs:
           ls -l
           echo "Contents of dist"
           ls dist -l
-          ${CC} -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
+          g++ -fPIC -shared ./Cbc/src/Cbc_C_Interface.cpp  \
           -o lib/cbc-c.so -L./dist/lib/ -I./dist/include/ \
           -lCbc -lCgl -lOsiClp -lClp -lOsi -lCoinUtils -lOsiCbc \
           -llapack -lblas -lgfortran -lquadmath -lm
